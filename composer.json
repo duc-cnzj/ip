@@ -1,0 +1,35 @@
+{
+    "name": "duc_cnzj/ip",
+    "description": "A SDK for ip.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "duc",
+            "email": "1025434218@qq.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.3",
+        "phpunit/phpunit": "^7.4",
+        "mockery/mockery": "^1.2",
+        "illuminate/support": "^5.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "DucCnzj\\Ip\\": "./src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Duc\\Ip\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "DucCnzj\\Ip\\ServiceProvider"
+            ]
+        }
+    }
+}
