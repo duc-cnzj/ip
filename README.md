@@ -1,11 +1,11 @@
-# /ip
+# ip
 
 A SDK for ip.
 
 ## Installing
 
 ```shell
-$ composer require duccnzj//ip -vvv
+$ composer require duccnzj/ip -vvv
 ```
 
 ## Usage
