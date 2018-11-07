@@ -4,6 +4,7 @@ namespace DucCnzj\Ip;
 
 use GuzzleHttp\Client;
 use DucCnzj\Ip\Exceptions\HttpException;
+use GuzzleHttp\Exception\ServerException;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
 
 class IpClient
@@ -28,6 +29,7 @@ class IpClient
         $this->ipAddress = $ipAddress;
     }
 
+    // 遍历url逐个获取结果
     public function getIpInfo()
     {
         $b = preg_match("/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/", $this->ipAddress);
@@ -43,6 +45,9 @@ class IpClient
                 ]
             );
         } catch (\Exception $e) {
+            if ($e instanceOf ServerException) {
+                throw new \Exception("服务器错误");
+            }
             throw new HttpException($e->getMessage(), $e->getCode(), $e);
         }
 
