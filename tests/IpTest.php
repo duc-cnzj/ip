@@ -2,54 +2,105 @@
 
 namespace DucCnzj\Ip\Tests;
 
-use GuzzleHttp\Client;
 use DucCnzj\Ip\IpClient;
-use GuzzleHttp\Psr7\Response;
+use DucCnzj\Ip\Imp\IpImp;
+use DucCnzj\Ip\DataMapper;
 use PHPUnit\Framework\TestCase;
-use DucCnzj\Ip\Exceptions\InvalidIpAddress;
+use DucCnzj\Ip\Strategies\TaobaoIp;
+use DucCnzj\Ip\Exceptions\IpProviderClassNotExistException;
 
 class IpTest extends TestCase
 {
+    protected $data = [
+        'ip'      => '127.0.0.1',
+        'country' => '阿鲁巴',
+        'region'  => '省市',
+        'city'    => '地区',
+        'address' => '中国浙江绍兴',
+        'point_x' => '10.00',
+        'point_y' => '20.00',
+        'isp'     => '移动',
+    ];
+
+//    /** @test */
+//    function test_get_ip()
+//    {
+//        $client = new IpClient();
+//        $client->setProviderConfig('baidu', ['ak' => 'swXuvzN8SoZeQUwcV1mtcMQhjAEMDyq5']);
+//        $client->setIp('126.0.0.1');
+//        var_dump($client->getCountry());
+//    }
+
     /** @test */
-    public function testGetInfoWithInvalidIp()
+    public function bound_test()
     {
-        $ip = new IpClient;
-        $this->expectException(InvalidIpAddress::class);
-        $this->expectExceptionMessage('ip 地址格式不正确');
-        $ip->getIpInfo();
-        $this->fail('ip 地址正确');
+        $client = new IpClient();
+        $taobao = \Mockery::mock(TaobaoIp::class);
+
+        $client->bound('taobao', $taobao);
+
+        $this->assertSame($client->getInstanceByName('taobao'), $taobao);
     }
 
     /** @test */
-    public function testGetInfoByIp()
+    public function get_ip_info()
     {
-        $response = new Response(200, [], '"{"code":0}"');
-        $client = \Mockery::mock(Client::class);
-        $client->allows()->get('http://ip.taobao.com/service/getIpInfo.php', [
-            'query' => ['ip' => '123.456.789.111'],
-        ])->andReturn($response);
+        $ip = '117.149.174.132';
 
-        $ip = \Mockery::mock(IpClient::class, ['123.456.789.111'])->makePartial();
-        $ip->allows()->getHttpClient()->andReturn($client);
+        $client = \Mockery::mock(IpClient::class);
 
-        $this->assertSame(
-            '"{"code":0}"',
-            $ip->getIpInfo()
-        );
+        $client->shouldReceive('setIp')->andReturn($client);
+
+        $client->shouldReceive('getOriginalInfo')->andReturn($this->data);
+
+        $client->shouldReceive('getCountry')->andReturn((new DataMapper($this->data))->getCountry());
+
+        $this->assertEquals($this->data, $client->setIp($ip)->getOriginalInfo());
+
+        $this->assertEquals('阿鲁巴', $client->setIp($ip)->getCountry());
     }
 
     /** @test */
-    public function testSetGuzzleOptions()
+    public function test_get_providers()
     {
-        $c = new IpClient;
+        $client = new IpClient();
 
-        // 设置参数前，timeout 为 null
-        $this->assertNull($c->getHttpClient()->getConfig('timeout'));
+        $providers = $client->getProviders();
 
-        // 设置参数
-        $c->setGuzzleOptions(['timeout' => 5000]);
+        $this->assertEquals(['baidu', 'taobao'], $providers);
+    }
 
-        // 设置参数后，timeout 为 5000
-        $this->assertSame(5000, $c->getHttpClient()->getConfig('timeout'));
+    /** @test */
+    public function test_resolve_providers()
+    {
+        $client = new IpClient();
+
+        $instances = $client->resolveProviders();
+
+        foreach ($instances as $instance) {
+            $this->assertInstanceOf(IpImp::class, $instance);
+        }
+    }
+
+    /** @test */
+    public function test_bound_providers()
+    {
+        $client = new IpClient();
+
+        $taobao = new TaobaoIp();
+        $client->useProvider('taobao');
+        $this->assertEquals(1, count($client->getProviders()));
+
+        $client->bound('taobao', $taobao);
+        $this->assertSame($client->getInstanceByName('taobao'), $taobao);
+    }
+
+    /** @test */
+    public function test_class_not_resolve_exception()
+    {
+        $this->expectException(IpProviderClassNotExistException::class);
+        $client = new IpClient();
+        $client->useProvider('duc');
+        $client->resolveProviders();
     }
 }

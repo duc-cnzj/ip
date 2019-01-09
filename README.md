@@ -11,9 +11,36 @@ $ composer require duccnzj/ip -vvv
 ## Usage
 
 ```php
-(new IpClient('xxx.xxx.xxx.xxx'))->getIpInfo();
+$client = new IpClient();
 
-(new IpClient)->setIpAddress('xxx.xxx.xxx.xxx')->getIpInfo();
+$client->setIp('xxx.xxx.xxx.xxx')->getCity();
+$client->setIp('xxx.xxx.xxx.xxx')->getCountry();
+$client->setIp('xxx.xxx.xxx.xxx')->getRegion();
+$client->setIp('xxx.xxx.xxx.xxx')->getIp();
+
+# or 
+$client->setIp('xxx.xxx.xxx.xxx');
+$client->getCity();
+$client->city;
+
+# use Provider (baidu, taobao)
+$client = new IpClient();
+
+# if use baidu api, you need provide ak secret.
+$client->useProvider('taobao')
+    ->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
+
+# if use taobao.
+$client->useProvider('taobao');
+
+# default use both baidu and taobao. if you want use both, pls set baidu ak secret.
+$client->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
+
+# package will try 3 times when provider response error. use try to reset tryTimes.
+$client->setIp('xxx.xxx.xxx.xxx')->try(10);
+
+# in laravel 
+ $client = app('ip');
 ```
 
 ## License

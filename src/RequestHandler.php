@@ -1,0 +1,82 @@
+<?php
+
+namespace DucCnzj\Ip;
+
+use GuzzleHttp\Client;
+use DucCnzj\Ip\Imp\IpImp;
+use GuzzleHttp\ClientInterface;
+use DucCnzj\Ip\Imp\RequestHandlerImp;
+use DucCnzj\Ip\Exceptions\ServerErrorException;
+use DucCnzj\Ip\Exceptions\NetworkErrorException;
+use DucCnzj\Ip\Exceptions\InvalidArgumentException;
+
+class RequestHandler implements RequestHandlerImp
+{
+    /**
+     * @var
+     */
+    protected $client;
+
+    /**
+     * @var int
+     */
+    public $tryTimes = 3;
+
+    /**
+     * @param int $tryTimes
+     *
+     * @return $this
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function setTryTimes(int $tryTimes)
+    {
+        $this->tryTimes = $tryTimes;
+
+        return $this;
+    }
+
+    /**
+     * @return ClientInterface
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getClient(): ClientInterface
+    {
+        return is_null($this->client)
+            ? $this->client = new Client()
+            : $this->client;
+    }
+
+    /**
+     * @param array  $providers
+     * @param string $ip
+     *
+     * @return array
+     * @throws NetworkErrorException
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function send($providers, $ip)
+    {
+        foreach ($providers as $name => $provider) {
+            echo "use provider {$name}";
+            for ($time = 1; $time <= $this->tryTimes; $time++) {
+                try {
+                    echo "{$name} 请求1次\n";
+                    /** @var IpImp $provider */
+                    return array_merge($provider->send($this->getClient(), $ip), [
+                        'provider' => $name,
+                        'success'  => true,
+                    ]);
+                } catch (ServerErrorException $e) {
+                    continue;
+                } catch (InvalidArgumentException $exception) {
+                    continue 2;
+                }
+            }
+        }
+
+        throw new NetworkErrorException();
+    }
+}
