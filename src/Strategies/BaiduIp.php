@@ -68,7 +68,6 @@ class BaiduIp implements IpImp
             $result = json_decode($originalStr, true);
 
             if ($result['status'] !== 0) {
-                echo '百度获取不到了';
                 throw new InvalidArgumentException($result['message']);
             }
 

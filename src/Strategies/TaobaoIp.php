@@ -27,21 +27,24 @@ class TaobaoIp implements IpImp
             $originalStr = $client->request('get', $this->url . '?ip=' . $ip)
                 ->getBody();
 
-            echo '淘宝获取成功';
+            $result = json_decode($originalStr, true);
+
+            if ($result['code'] !== 0) {
+                throw new ServerErrorException();
+            }
+
+            $data['ip'] = $ip;
+            $data['country'] = $result['data']['country'];
+            $data['region'] = $result['data']['region'];
+            $data['city'] = $result['data']['city'];
+            $data['address'] = $data['country'] . $data['region'] . $data['city'];
+            $data['point_x'] = '';
+            $data['point_y'] = '';
+            $data['isp'] = $result['data']['isp'];
+
+            return $data;
         } catch (ServerException | ClientException $e) {
             throw new ServerErrorException();
         }
-
-        $result = json_decode($originalStr, true);
-        $data['ip'] = $ip;
-        $data['country'] = $result['data']['country'];
-        $data['region'] = $result['data']['region'];
-        $data['city'] = $result['data']['city'];
-        $data['address'] = $data['country'] . $data['region'] . $data['city'];
-        $data['point_x'] = '';
-        $data['point_y'] = '';
-        $data['isp'] = $result['data']['isp'];
-
-        return $data;
     }
 }
