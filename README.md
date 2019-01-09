@@ -18,7 +18,7 @@ $client->setIp('xxx.xxx.xxx.xxx')->getCountry();
 $client->setIp('xxx.xxx.xxx.xxx')->getRegion();
 $client->setIp('xxx.xxx.xxx.xxx')->getIp();
 
-# or 
+# or
 $client->setIp('xxx.xxx.xxx.xxx');
 $client->getCity();
 $client->city;
@@ -27,7 +27,7 @@ $client->city;
 $client = new IpClient();
 
 # if use baidu api, you need provide ak secret.
-$client->useProvider('taobao')
+$client->useProvider('baidu')
     ->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
 
 # if use taobao.
@@ -39,7 +39,7 @@ $client->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
 # package will try 3 times when provider response error. use try to reset tryTimes.
 $client->setIp('xxx.xxx.xxx.xxx')->try(10);
 
-# in laravel 
+# in laravel
  $client = app('ip');
 ```
 
