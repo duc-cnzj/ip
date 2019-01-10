@@ -256,9 +256,9 @@ class IpTest extends TestCase
     /** @test */
     public function try_times_test()
     {
-        $this->assertEquals(3, $this->client->getRequestHandler()->tryTimes);
+        $this->assertEquals(3, $this->client->getRequestHandler()->getTryTimes());
 
         $this->client->try(10);
-        $this->assertEquals(10, $this->client->getRequestHandler()->tryTimes);
+        $this->assertEquals(10, $this->client->getRequestHandler()->getTryTimes());
     }
 }
