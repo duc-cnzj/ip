@@ -57,7 +57,11 @@ class IpTest extends TestCase
 
         $client = \Mockery::mock(IpClient::class)->makePartial();
         $httpClient = \Mockery::mock(ClientInterface::class);
+
+        /** @var TaobaoIp $taobao */
         $taobao = \Mockery::mock(TaobaoIp::class);
+
+        /** @var RequestHandler $handler */
         $handler = \Mockery::mock(RequestHandler::class)->makePartial();
 
         $exception = new InvalidArgumentException();
