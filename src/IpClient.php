@@ -79,7 +79,7 @@ class IpClient
      *
      * @author duc <1025434218@qq.com>
      */
-    public function checkIp(string $ip): void
+    public function checkIp(string $ip)
     {
         $b = preg_match("/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/", $ip);
 
