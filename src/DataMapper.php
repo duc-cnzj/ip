@@ -95,7 +95,7 @@ class DataMapper implements DataMapImp
      *
      * @author duc <1025434218@qq.com>
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         $field = toUnderScore($name);
 
