@@ -19,13 +19,17 @@ class DataMapper implements DataMapImp
     protected $info = null;
 
     /**
-     * DataMapper constructor.
-     *
      * @param array $info
+     *
+     * @return DataMapImp
+     *
+     * @author duc <1025434218@qq.com>
      */
-    public function __construct(array $info)
+    public function setInfo(array $info): DataMapImp
     {
         $this->info = $info;
+
+        return $this;
     }
 
     /**
@@ -35,7 +39,7 @@ class DataMapper implements DataMapImp
      */
     public function getCity(): string
     {
-        return $this->info['city'];
+        return $this->getField('city');
     }
 
     /**
@@ -45,7 +49,7 @@ class DataMapper implements DataMapImp
      */
     public function getCountry(): string
     {
-        return $this->info['country'];
+        return $this->getField('country');
     }
 
     /**
@@ -55,7 +59,7 @@ class DataMapper implements DataMapImp
      */
     public function getRegion(): string
     {
-        return $this->info['region'];
+        return $this->getField('region');
     }
 
     /**
@@ -65,7 +69,17 @@ class DataMapper implements DataMapImp
      */
     public function getAddress(): string
     {
-        return $this->info['address'];
+        return $this->getField('address');
+    }
+
+    /**
+     * @return string
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getIp(): string
+    {
+        return $this->getField('ip');
     }
 
     /**
@@ -79,16 +93,6 @@ class DataMapper implements DataMapImp
     }
 
     /**
-     * @return string
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function getIp(): string
-    {
-        return $this->info['ip'];
-    }
-
-    /**
      * @param $name
      *
      * @return mixed|string
@@ -99,7 +103,7 @@ class DataMapper implements DataMapImp
     {
         $field = toUnderScore($name);
 
-        return isset($this->info[$field]) ? $this->info[$field] : '';
+        return $this->getField($field);
     }
 
     /**
@@ -118,11 +122,23 @@ class DataMapper implements DataMapImp
         if (count($matches) >= 2 && strlen($name) > 3) {
             $field = toUnderScore($matches[1][0]);
 
-            return isset($this->info[$field]) ? $this->info[$field] : '';
+            return $this->getField($field);
         }
 
         if (! method_exists($this, $name)) {
             throw new MethodNotExistException("{$name} 方法不存在");
         }
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return string
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getField(string $field):string
+    {
+        return isset($this->info[$field]) ? $this->info[$field] : '';
     }
 }

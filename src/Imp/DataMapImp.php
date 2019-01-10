@@ -17,6 +17,15 @@ interface DataMapImp
     public function hasInfo(): bool;
 
     /**
+     * @param array $info
+     *
+     * @return DataMapImp
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function setInfo(array $info): DataMapImp;
+
+    /**
      * @return string|null
      *
      * @author duc <1025434218@qq.com>

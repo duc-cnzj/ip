@@ -19,13 +19,17 @@ class NullDataMapper implements DataMapImp
     protected $info = [];
 
     /**
-     * DataMapper constructor.
-     *
      * @param array $info
+     *
+     * @return DataMapImp
+     *
+     * @author duc <1025434218@qq.com>
      */
-    public function __construct(array $info)
+    public function setInfo(array $info): DataMapImp
     {
         $this->info = $info;
+
+        return $this;
     }
 
     /**

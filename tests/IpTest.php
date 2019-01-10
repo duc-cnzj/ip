@@ -38,6 +38,22 @@ class IpTest extends TestCase
         'provider' => 'taobao',
     ];
 
+    /**
+     * @var array
+     */
+    protected $data1 = [
+        'ip'       => '127.0.0.2',
+        'country'  => '芭芭拉',
+        'region'   => '墨兰',
+        'city'     => '次序',
+        'address'  => '芭芭拉墨兰次序',
+        'point_x'  => '4000',
+        'point_y'  => '3000',
+        'isp'      => '电信',
+        'success'  => 1,
+        'provider' => 'taobao',
+    ];
+
     protected $errors = [
         'success' => 0,
         'message' => '获取 ip 信息失败',
@@ -303,7 +319,7 @@ class IpTest extends TestCase
 
         $client = \Mockery::mock(IpClient::class)->makePartial();
 
-        $client->shouldReceive('setIp')->andReturn($client);
+        $client->shouldReceive('setIp')->with($ip)->andReturn($client);
 
         $client->shouldReceive('getOriginalInfo')->andReturn($this->data);
 
@@ -382,5 +398,39 @@ class IpTest extends TestCase
 
         $this->client->try(10);
         $this->assertEquals(10, $this->client->getRequestHandler()->getTryTimes());
+    }
+
+    /** @test */
+    public function change_ip_test()
+    {
+        $ip = '127.0.0.1';
+
+        $ip1 = '127.0.0.2';
+        $client = \Mockery::mock(IpClient::class)->makePartial();
+        $exception = new ServerErrorException;
+
+        /** @var RequestHandler $handler */
+        $handler = \Mockery::mock(RequestHandler::class)->makePartial();
+        $httpClient = \Mockery::mock(ClientInterface::class);
+        $taobao = \Mockery::mock(TaobaoIp::class);
+
+        $taobao->expects()->send($httpClient, $ip)->times(8)->andThrow($exception);
+        $taobao->expects()->send($httpClient, $ip)->andReturn($this->data);
+        $taobao->expects()->send($httpClient, $ip1)->andReturn($this->data1);
+
+        // 模拟 ip 服务端获取失败的情况。
+        $handler->shouldReceive('getClient')->andReturn($httpClient);
+
+        $client->shouldReceive('getRequestHandler')->andReturn($handler);
+        $client->useProvider('taobao')->bound('taobao', $taobao);
+
+        $client->setIp($ip)->try(20);
+        $this->assertEquals(
+            $this->data,
+            $client->getOriginalInfo()
+        );
+
+        $client->setIp($ip1);
+        $this->assertEquals($this->data1, $client->getOriginalInfo());
     }
 }

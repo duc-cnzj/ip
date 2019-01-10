@@ -22,7 +22,8 @@ class MapperTest extends TestCase
     /** @test */
     public function mapper_test()
     {
-        $map = new DataMapper($this->data);
+        $map = new DataMapper();
+        $map->setInfo($this->data);
 
         $this->assertEquals('127.0.0.1', $map->getIp());
 
@@ -47,7 +48,9 @@ class MapperTest extends TestCase
     {
         $this->expectException(MethodNotExistException::class);
 
-        $map = new DataMapper($this->data);
+        $map = new DataMapper();
+
+        $map->setInfo($this->data);
 
         $map->duc();
     }

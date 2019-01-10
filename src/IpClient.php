@@ -153,14 +153,16 @@ class IpClient
         $response = $this->getOriginalInfo();
 
         if (! $response['success']) {
-            return new NullDataMapper(['ip' => $this->getIp()]);
+            return (new NullDataMapper())->setInfo(['ip' => $this->getIp()]);
         }
 
         if (! $this->dataMapper) {
-            return $this->dataMapper = new DataMapper($response);
+            $this->dataMapper = new DataMapper();
+
+            return $this->dataMapper->setInfo($response);
         }
 
-        return $this->dataMapper;
+        return $this->dataMapper->setInfo($response);
     }
 
     /**
