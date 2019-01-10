@@ -57,7 +57,7 @@ class RequestHandler implements RequestHandlerImp
      *
      * @author duc <1025434218@qq.com>
      */
-    public function send($providers, $ip)
+    public function send(array $providers, string $ip)
     {
         foreach ($providers as $name => $provider) {
             for ($time = 1; $time <= $this->getTryTimes(); $time++) {
