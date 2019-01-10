@@ -15,4 +15,8 @@ interface DataMapImp
     public function getRegion(): string;
 
     public function getAddress(): string;
+
+    public function __call(string $name, $params);
+
+    public function __get(string $name);
 }

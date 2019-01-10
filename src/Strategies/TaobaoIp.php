@@ -13,7 +13,7 @@ class TaobaoIp implements IpImp
     protected $url = 'http://ip.taobao.com/service/getIpInfo.php';
 
     /**
-     * @param ClientInterface $client
+     * @param ClientInterface $httpClient
      *
      * @param string          $ip
      *
@@ -21,10 +21,10 @@ class TaobaoIp implements IpImp
      * @throws ServerErrorException
      * @author duc <1025434218@qq.com>
      */
-    public function send(ClientInterface $client, string $ip):array
+    public function send(ClientInterface $httpClient, string $ip):array
     {
         try {
-            $originalStr = $client->request('get', $this->url . '?ip=' . $ip)
+            $originalStr = $httpClient->request('get', $this->url . '?ip=' . $ip)
                 ->getBody();
 
             $result = json_decode($originalStr, true);
@@ -34,17 +34,33 @@ class TaobaoIp implements IpImp
             }
 
             $data['ip'] = $ip;
-            $data['country'] = $result['data']['country'];
-            $data['region'] = $result['data']['region'];
-            $data['city'] = $result['data']['city'];
-            $data['address'] = $data['country'] . $data['region'] . $data['city'];
-            $data['point_x'] = '';
-            $data['point_y'] = '';
-            $data['isp'] = $result['data']['isp'];
+
+            $data = $this->formatResult($data, $result);
 
             return $data;
         } catch (ServerException | ClientException $e) {
             throw new ServerErrorException();
         }
+    }
+
+    /**
+     * @param array $result
+     * @param array $data
+     *
+     * @return array
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function formatResult(array $data, array $result)
+    {
+        $data['country'] = $result['data']['country'];
+        $data['region'] = $result['data']['region'];
+        $data['city'] = $result['data']['city'];
+        $data['address'] = $data['country'] . $data['region'] . $data['city'];
+        $data['point_x'] = '';
+        $data['point_y'] = '';
+        $data['isp'] = $result['data']['isp'];
+
+        return $data;
     }
 }

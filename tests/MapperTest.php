@@ -4,6 +4,7 @@ namespace DucCnzj\Ip\Tests;
 
 use DucCnzj\Ip\DataMapper;
 use PHPUnit\Framework\TestCase;
+use DucCnzj\Ip\Exceptions\MethodNotExistException;
 
 class MapperTest extends TestCase
 {
@@ -17,7 +18,6 @@ class MapperTest extends TestCase
         'point_y' => '20.00',
         'isp'     => '移动',
     ];
-
 
     /** @test */
     public function mapper_test()
@@ -40,5 +40,15 @@ class MapperTest extends TestCase
 
         $this->assertEquals('', $map->getDuc());
         $this->assertEquals('', $map->duc);
+    }
+
+    /** @test */
+    public function call_exception_test()
+    {
+        $this->expectException(MethodNotExistException::class);
+
+        $map = new DataMapper($this->data);
+
+        $map->duc();
     }
 }

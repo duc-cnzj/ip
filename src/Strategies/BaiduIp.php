@@ -61,7 +61,6 @@ class BaiduIp implements IpImp
     public function send(ClientInterface $client, string $ip): array
     {
         try {
-            $data = [];
             $originalStr = $client->request('get', $this->url . '?ip=' . $ip . '&ak=' . $this->getAk())
                 ->getBody();
 
@@ -71,18 +70,33 @@ class BaiduIp implements IpImp
                 throw new InvalidArgumentException($result['message']);
             }
 
-            $data['ip'] = $ip;
-            $data['country'] = '中国';
-            $data['isp'] = '';
-            $data['address'] = $data['country'] . $result['content']['address'];
-            $data['region'] = $result['content']['address_detail']['province'];
-            $data['city'] = $result['content']['address_detail']['city'];
-            $data['point_x'] = $result['content']['point']['x'];
-            $data['point_y'] = $result['content']['point']['y'];
+            $data = ['ip' => $ip];
+            $data = $this->formatResult($data, $result);
 
             return $data;
         } catch (ServerException | ClientException $e) {
             throw new ServerErrorException();
         }
+    }
+
+    /**
+     * @param array $data
+     * @param array $result
+     *
+     * @return mixed
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function formatResult(array $data, array $result)
+    {
+        $data['country'] = '中国';
+        $data['isp'] = '';
+        $data['address'] = $data['country'] . $result['content']['address'];
+        $data['region'] = $result['content']['address_detail']['province'];
+        $data['city'] = $result['content']['address_detail']['city'];
+        $data['point_x'] = $result['content']['point']['x'];
+        $data['point_y'] = $result['content']['point']['y'];
+
+        return $data;
     }
 }

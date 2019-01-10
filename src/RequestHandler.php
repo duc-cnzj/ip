@@ -7,13 +7,12 @@ use DucCnzj\Ip\Imp\IpImp;
 use GuzzleHttp\ClientInterface;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
-use DucCnzj\Ip\Exceptions\NetworkErrorException;
 use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 
 class RequestHandler implements RequestHandlerImp
 {
     /**
-     * @var
+     * @var ClientInterface|null
      */
     protected $client;
 
@@ -53,21 +52,19 @@ class RequestHandler implements RequestHandlerImp
      * @param string $ip
      *
      * @return array
-     * @throws NetworkErrorException
+     * @throws ServerErrorException
      *
      * @author duc <1025434218@qq.com>
      */
     public function send($providers, $ip)
     {
         foreach ($providers as $name => $provider) {
-            echo "use provider {$name}";
             for ($time = 1; $time <= $this->tryTimes; $time++) {
                 try {
-                    echo "{$name} 请求1次\n";
                     /** @var IpImp $provider */
                     return array_merge($provider->send($this->getClient(), $ip), [
                         'provider' => $name,
-                        'success'  => true,
+                        'success'  => 1,
                     ]);
                 } catch (ServerErrorException $e) {
                     continue;
@@ -77,6 +74,6 @@ class RequestHandler implements RequestHandlerImp
             }
         }
 
-        throw new NetworkErrorException();
+        throw new ServerErrorException();
     }
 }

@@ -26,6 +26,5 @@ class RequestHandlerTest extends TestCase
         $handler->setTryTimes(10);
 
         $this->assertEquals(10, $handler->tryTimes);
-
     }
 }

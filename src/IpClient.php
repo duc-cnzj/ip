@@ -7,7 +7,7 @@ use DucCnzj\Ip\Imp\DataMapImp;
 use DucCnzj\Ip\Imp\CacheStoreImp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
-use DucCnzj\Ip\Exceptions\NetworkErrorException;
+use DucCnzj\Ip\Exceptions\ServerErrorException;
 use DucCnzj\Ip\Exceptions\IpProviderClassNotExistException;
 
 /**
@@ -43,14 +43,14 @@ class IpClient
     protected $instances = [];
 
     /**
-     * @var null|DataMapImp
+     * @var DataMapImp
      */
-    protected $dataMapper = null;
+    protected $dataMapper;
 
     /**
      * @var null|CacheStoreImp
      */
-    protected $cacheStore = null;
+    protected $cacheStore;
 
     /**
      * @var RequestHandlerImp|null
@@ -141,15 +141,19 @@ class IpClient
     }
 
     /**
-     * @return array|DataMapper|DataMapImp|null
+     * @return DataMapper|DataMapImp|NullDataMapper
      *
      * @author duc <1025434218@qq.com>
      */
     public function getDataMapper()
     {
-        if (! $this->dataMapper) {
-            $response = $this->getOriginalInfo();
+        $response = $this->getOriginalInfo();
 
+        if (! $response['success']) {
+            return new NullDataMapper();
+        }
+
+        if (! $this->dataMapper) {
             return $this->dataMapper = new DataMapper($response);
         }
 
@@ -181,8 +185,12 @@ class IpClient
             return $info;
         }
 
-        $result = $this->getRequestHandler()
-            ->send($this->resolveProviders(), $this->getIp());
+        try {
+            $result = $this->getRequestHandler()
+                ->send($this->resolveProviders(), $this->getIp());
+        } catch (ServerErrorException $e) {
+            return $this->responseWithError($e->getMessage());
+        }
 
         $this->cacheStore->put($this->getIp(), $result);
 
@@ -219,7 +227,7 @@ class IpClient
      *
      * @author duc <1025434218@qq.com>
      */
-    protected function getIp()
+    public function getIp()
     {
         if (is_null($this->ip)) {
             throw new \Exception('请先设置 ip');
@@ -256,7 +264,7 @@ class IpClient
     }
 
     /**
-     * @return CacheStore|CacheStoreImp|null
+     * @return CacheStore|CacheStoreImp
      *
      * @author duc <1025434218@qq.com>
      */
@@ -378,8 +386,6 @@ class IpClient
         return isset($this->instances[$name]) ? $this->instances[$name] : null;
     }
 
-
-
     /**
      * @param string $name
      * @param $arguments
@@ -390,15 +396,7 @@ class IpClient
      */
     public function __call(string $name, $arguments)
     {
-        try {
-            if ($this->getDataMapper()->hasInfo()) {
-                return $this->getDataMapper()->{$name}(...$arguments);
-            } else {
-                return $this->responseWithError('请先获取数据');
-            }
-        } catch (NetworkErrorException $e) {
-            return $this->responseWithError($e->getMessage());
-        }
+        return $this->getDataMapper()->{$name}(...$arguments);
     }
 
     /**
