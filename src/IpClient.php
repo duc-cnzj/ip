@@ -8,6 +8,7 @@ use DucCnzj\Ip\Imp\CacheStoreImp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
+use DucCnzj\Ip\Exceptions\NetworkErrorException;
 use DucCnzj\Ip\Exceptions\IpProviderClassNotExistException;
 
 /**
@@ -190,13 +191,18 @@ class IpClient
         try {
             $result = $this->getRequestHandler()
                 ->send($this->resolveProviders(), $this->getIp());
-        } catch (ServerErrorException $e) {
+        } catch (ServerErrorException | NetworkErrorException $e) {
             return $this->responseWithError($e->getMessage());
         }
 
         $this->cacheStore->put($this->getIp(), $result);
 
         return $result;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->getRequestHandler()->getErrors();
     }
 
     /**

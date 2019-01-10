@@ -12,6 +12,7 @@ use DucCnzj\Ip\Strategies\TaobaoIp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
+use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 use DucCnzj\Ip\Exceptions\IpProviderClassNotExistException;
 
 class IpTest extends TestCase
@@ -47,6 +48,37 @@ class IpTest extends TestCase
     {
         parent::setUp();
         $this->client = new IpClient();
+    }
+
+    /** @test */
+    public function test_get_errors()
+    {
+        $ip = '127.0.0.1';
+
+        $client = \Mockery::mock(IpClient::class)->makePartial();
+        $httpClient = \Mockery::mock(ClientInterface::class);
+        $taobao = \Mockery::mock(TaobaoIp::class);
+        $handler = \Mockery::mock(RequestHandler::class)->makePartial();
+
+        $exception = new InvalidArgumentException();
+        $exception1 = new ServerErrorException();
+
+        $taobao->expects()->send($httpClient, $ip)->times(1)->andThrow($exception1);
+        $taobao->expects()->send($httpClient, $ip)->times(1)->andThrow($exception);
+
+        $handler->shouldReceive('getClient')->andReturn($httpClient);
+
+        $client->setIp($ip)->bound('taobao', $taobao)->useProvider('taobao');
+
+        $client->shouldReceive('getRequestHandler')->andReturn($handler);
+        $client->shouldReceive('getCity')->andReturn($client->getDataMapper()->getCity());
+
+        $client->getCity();
+
+        $this->assertEquals([
+            '获取 ip 信息失败',
+            '参数验证失败',
+        ], $client->getErrors());
     }
 
     /** @test */

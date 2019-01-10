@@ -7,6 +7,7 @@ use DucCnzj\Ip\Imp\IpImp;
 use GuzzleHttp\ClientInterface;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
+use DucCnzj\Ip\Exceptions\NetworkErrorException;
 use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 
 class RequestHandler implements RequestHandlerImp
@@ -15,6 +16,11 @@ class RequestHandler implements RequestHandlerImp
      * @var ClientInterface|null
      */
     protected $client;
+
+    /**
+     * @var array
+     */
+    protected $errors = [];
 
     /**
      * @var int
@@ -34,10 +40,19 @@ class RequestHandler implements RequestHandlerImp
     }
 
     /**
+     * @return array
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    /**
      * @param array  $providers
      * @param string $ip
      *
      * @return array
+     * @throws NetworkErrorException
      * @throws ServerErrorException
      *
      * @author duc <1025434218@qq.com>
@@ -53,9 +68,17 @@ class RequestHandler implements RequestHandlerImp
                         'success'  => 1,
                     ]);
                 } catch (ServerErrorException $e) {
+                    $this->errors[] = $e->getMessage();
+
                     continue;
                 } catch (InvalidArgumentException $exception) {
+                    $this->errors[] = $exception->getMessage();
+
                     continue 2;
+                } catch (\Exception $e) {
+                    $this->errors[] = $e->getMessage();
+
+                    break 2;
                 }
             }
         }
@@ -84,5 +107,4 @@ class RequestHandler implements RequestHandlerImp
 
         return $this;
     }
-
 }

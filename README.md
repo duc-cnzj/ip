@@ -59,7 +59,7 @@ $client->useProvider('taobao')
     ->getIsp();
 ```
 
-when getXXX() false it will return null;
+when getXXX() false it will return null, u can use `$client->getErrors()` get error info;
 
 
 ## License

@@ -13,4 +13,6 @@ interface RequestHandlerImp
     public function setTryTimes(int $times);
 
     public function getTryTimes(): int;
+
+    public function getErrors(): array ;
 }
