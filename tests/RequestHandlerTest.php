@@ -19,7 +19,7 @@ class RequestHandlerTest extends TestCase
     }
 
     /** @test */
-    function test_try_times()
+    public function test_try_times()
     {
         $handler = new RequestHandler();
 

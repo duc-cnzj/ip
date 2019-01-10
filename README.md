@@ -43,6 +43,25 @@ $client->setIp('xxx.xxx.xxx.xxx')->try(10);
  $client = app('ip');
 ```
 
+extra property
+```php
+# baidu return point_x and point_y, so you can:
+$client->useProvider('baidu')
+    ->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
+
+$client->getPointX();
+$client->getPointY();
+
+# taobao return isp, so u can:
+
+$client->useProvider('taobao')
+    ->setIp('xxx.xxx.xxx.xxx')
+    ->getIsp();
+```
+
+when getXXX() false it will return null;
+
+
 ## License
 
 MIT

@@ -5,33 +5,77 @@ namespace DucCnzj\Ip;
 use DucCnzj\Ip\Imp\DataMapImp;
 use DucCnzj\Ip\Exceptions\MethodNotExistException;
 
+/**
+ *
+ * Class NullDataMapper
+ *
+ * @package DucCnzj\Ip
+ */
 class NullDataMapper implements DataMapImp
 {
+    /**
+     * @var array
+     */
     protected $info = [];
 
+    /**
+     * DataMapper constructor.
+     *
+     * @param array $info
+     */
+    public function __construct(array $info)
+    {
+        $this->info = $info;
+    }
+
+    /**
+     * @return string
+     *
+     * @author duc <1025434218@qq.com>
+     */
     public function getIp(): string
     {
-        return '';
+        return $this->info['ip'];
     }
 
-    public function getCity(): string
+    /**
+     * @return null
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getCity()
     {
-        return '';
+        return null;
     }
 
-    public function getCountry(): string
+    /**
+     * @return null
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getCountry()
     {
-        return '';
+        return null;
     }
 
-    public function getRegion(): string
+    /**
+     * @return null
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getRegion()
     {
-        return '';
+        return null;
     }
 
-    public function getAddress(): string
+    /**
+     * @return null
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getAddress()
     {
-        return '';
+        return null;
     }
 
     /**
@@ -45,7 +89,7 @@ class NullDataMapper implements DataMapImp
     {
         $field = toUnderScore($name);
 
-        return isset($this->info[$field]) ? $this->info[$field] : '';
+        return isset($this->info[$field]) ? $this->info[$field] : null;
     }
 
     /**
@@ -64,7 +108,7 @@ class NullDataMapper implements DataMapImp
         if (count($matches) >= 2 && strlen($name) > 3) {
             $field = toUnderScore($matches[1][0]);
 
-            return isset($this->info[$field]) ? $this->info[$field] : '';
+            return isset($this->info[$field]) ? $this->info[$field] : null;
         }
 
         if (! method_exists($this, $name)) {
@@ -72,6 +116,11 @@ class NullDataMapper implements DataMapImp
         }
     }
 
+    /**
+     * @return bool
+     *
+     * @author duc <1025434218@qq.com>
+     */
     public function hasInfo(): bool
     {
         return false;

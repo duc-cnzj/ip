@@ -4,7 +4,6 @@ namespace DucCnzj\Ip\Tests;
 
 use DucCnzj\Ip\IpClient;
 use DucCnzj\Ip\Imp\IpImp;
-use DucCnzj\Ip\DataMapper;
 use DucCnzj\Ip\NullDataMapper;
 use DucCnzj\Ip\RequestHandler;
 use GuzzleHttp\ClientInterface;
@@ -75,6 +74,7 @@ class IpTest extends TestCase
             $client->getOriginalInfo()
         );
     }
+
     /** @test */
     public function get_original_fail_test()
     {
@@ -133,19 +133,20 @@ class IpTest extends TestCase
 
         $client->shouldReceive('getOriginalInfo')->andReturn($this->errors);
 
+        $client->setIp($ip);
+
         $client->shouldReceive('getAddress')->andReturn(
             $client->getDataMapper()
                 ->getAddress()
         );
         $client->shouldReceive('getCity')->andReturn($client->getDataMapper()->getCity());
 
-        $client->setIp($ip);
         $this->assertEquals($ip, $client->getIp());
 
         $this->assertEquals($this->errors, $client->getOriginalInfo());
         $this->assertInstanceOf(NullDataMapper::class, $client->getDataMapper());
-        $this->assertEquals('', $client->getCity());
-        $this->assertEquals('', $client->getAddress());
+        $this->assertNull($client->getCity());
+        $this->assertNull($client->getAddress());
     }
 
     /** @test */

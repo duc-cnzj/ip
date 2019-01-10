@@ -2,21 +2,71 @@
 
 namespace DucCnzj\Ip\Imp;
 
+/**
+ * Interface DataMapImp
+ *
+ * @package DucCnzj\Ip\Imp
+ */
 interface DataMapImp
 {
+    /**
+     * @return bool
+     *
+     * @author duc <1025434218@qq.com>
+     */
     public function hasInfo(): bool;
 
-    public function getIp(): string;
+    /**
+     * @return string|null
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getIp();
 
-    public function getCity(): string;
+    /**
+     * @return string|null
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getCity();
 
-    public function getCountry(): string;
+    /**
+     * @return string|null
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getCountry();
 
-    public function getRegion(): string;
+    /**
+     * @return string|null
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getRegion();
 
-    public function getAddress(): string;
+    /**
+     * @return string|null
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getAddress();
 
+    /**
+     * @param string $name
+     * @param        $params
+     *
+     * @return mixed
+     *
+     * @author duc <1025434218@qq.com>
+     */
     public function __call(string $name, $params);
 
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     *
+     * @author duc <1025434218@qq.com>
+     */
     public function __get(string $name);
 }
