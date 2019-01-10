@@ -65,6 +65,12 @@ $client->useProvider('taobao')
 
 when getXXX() false it will return null, u can use `$client->getErrors()` get error info;
 
+alias
+```php
+$client->use('taobao'); 
+# Equals to
+$client->useProvider('taobao'); 
+```
 
 ## License
 

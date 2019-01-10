@@ -202,6 +202,11 @@ class IpClient
         return $result;
     }
 
+    /**
+     * @return array
+     *
+     * @author duc <1025434218@qq.com>
+     */
     public function getErrors(): array
     {
         return $this->getRequestHandler()->getErrors();
@@ -391,6 +396,25 @@ class IpClient
         return $this;
     }
 
+    /**
+     * @param string $provider
+     *
+     * @return IpClient
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function use(string $provider)
+    {
+        return $this->useProvider($provider);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed|null
+     *
+     * @author duc <1025434218@qq.com>
+     */
     public function getInstanceByName(string $name)
     {
         return isset($this->instances[$name]) ? $this->instances[$name] : null;
