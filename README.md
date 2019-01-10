@@ -2,6 +2,10 @@
 
 A SDK for ip.
 
+[![Build Status](https://travis-ci.com/DuC-cnZj/ip.svg?branch=master)](https://travis-ci.com/DuC-cnZj/ip)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DuC-cnZj/ip/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DuC-cnZj/ip/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/DuC-cnZj/ip/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/DuC-cnZj/ip/?branch=master)
+
 ## Installing
 
 ```shell

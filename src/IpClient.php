@@ -191,7 +191,9 @@ class IpClient
         try {
             $result = $this->getRequestHandler()
                 ->send($this->resolveProviders(), $this->getIp());
-        } catch (ServerErrorException | NetworkErrorException $e) {
+        } catch (ServerErrorException $e) {
+            return $this->responseWithError($e->getMessage());
+        } catch (NetworkErrorException $e) {
             return $this->responseWithError($e->getMessage());
         }
 

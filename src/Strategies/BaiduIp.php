@@ -74,7 +74,9 @@ class BaiduIp implements IpImp
             $data = $this->formatResult($data, $result);
 
             return $data;
-        } catch (ServerException | ClientException $e) {
+        } catch (ServerException $e) {
+            throw new ServerErrorException();
+        } catch (ClientException $e) {
             throw new ServerErrorException();
         }
     }
