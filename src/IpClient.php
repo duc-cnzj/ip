@@ -95,7 +95,9 @@ class IpClient
     public function resolveProviders()
     {
         foreach ($this->getProviders() as $provider) {
-            $this->instances[$provider] = $this->createProvider($provider);
+            if (! isset($this->instances[$provider])) {
+                $this->instances[$provider] = $this->createProvider($provider);
+            }
         }
 
         return $this->instances;
@@ -110,7 +112,7 @@ class IpClient
      *
      * @author duc <1025434218@qq.com>
      */
-    protected function createProvider($provider)
+    public function createProvider($provider)
     {
         $config = $this->getProviderConfig($provider);
 
@@ -132,7 +134,7 @@ class IpClient
      *
      * @author duc <1025434218@qq.com>
      */
-    protected function responseWithError($msg)
+    public function responseWithError($msg)
     {
         return [
             'success' => 0,
@@ -216,7 +218,7 @@ class IpClient
      *
      * @author duc <1025434218@qq.com>
      */
-    protected function getDefaultCacheDriver()
+    public function getDefaultCacheDriver()
     {
         return new CacheStore();
     }
@@ -241,7 +243,7 @@ class IpClient
      *
      * @author duc <1025434218@qq.com>
      */
-    protected function getDefaultProviders()
+    public function getDefaultProviders()
     {
         return [
             'baidu',

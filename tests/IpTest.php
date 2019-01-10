@@ -5,6 +5,7 @@ namespace DucCnzj\Ip\Tests;
 use DucCnzj\Ip\IpClient;
 use DucCnzj\Ip\Imp\IpImp;
 use DucCnzj\Ip\DataMapper;
+use DucCnzj\Ip\NullDataMapper;
 use DucCnzj\Ip\RequestHandler;
 use GuzzleHttp\ClientInterface;
 use PHPUnit\Framework\TestCase;
@@ -25,14 +26,16 @@ class IpTest extends TestCase
      * @var array
      */
     protected $data = [
-        'ip'      => '127.0.0.1',
-        'country' => '阿鲁巴',
-        'region'  => '省市',
-        'city'    => '地区',
-        'address' => '中国浙江绍兴',
-        'point_x' => '10.00',
-        'point_y' => '20.00',
-        'isp'     => '移动',
+        'ip'       => '127.0.0.1',
+        'country'  => '阿鲁巴',
+        'region'   => '省市',
+        'city'     => '地区',
+        'address'  => '中国浙江绍兴',
+        'point_x'  => '10.00',
+        'point_y'  => '20.00',
+        'isp'      => '移动',
+        'success'  => 1,
+        'provider' => 'taobao',
     ];
 
     protected function setUp(
@@ -43,23 +46,41 @@ class IpTest extends TestCase
     }
 
     /** @test */
-    public function get_original_fail_test()
+    public function get_original_success_test()
     {
         $ip = '127.0.0.1';
         $client = \Mockery::mock(IpClient::class)->makePartial();
 
-        // 模拟 ip 服务端获取失败的情况。
-        $handler = \Mockery::mock(RequestHandlerImp::class);
-        $exception = new ServerErrorException;
-        $handler->shouldReceive('send')->andThrow($exception);
+        $client->shouldReceive('getOriginalInfo')->andReturn($this->data);
 
-        $client->shouldReceive('setIp')->with($ip)->andReturn($client);
-        $client->shouldReceive('getIp')->andReturn($ip);
+        $client->shouldReceive('getAddress')->andReturn($client->getDataMapper()->getAddress());
+        $client->shouldReceive('getCity')->andReturn($client->getDataMapper()->getCity());
+
+        $client->setIp($ip);
+        $this->assertEquals($ip, $client->getIp());
+
+        $this->assertEquals($this->data, $client->getOriginalInfo());
+        $this->assertEquals('地区', $client->getCity());
+        $this->assertEquals('中国浙江绍兴', $client->getAddress());
+    }
+
+    /** @test */
+    public function get_original_fail_test()
+    {
+        $ip = '127.0.0.1';
+        $client = \Mockery::mock(IpClient::class)->makePartial();
+        $handler = \Mockery::mock(RequestHandlerImp::class);
+
+        $exception = new ServerErrorException;
+
+        // 模拟 ip 服务端获取失败的情况。
+        $handler->shouldReceive('send')->andThrow($exception);
 
         $client->shouldReceive('getRequestHandler')->andReturn($handler);
 
+        $client->setIp($ip);
+
         $this->assertEquals($ip, $client->getIp());
-        $this->assertEquals($client, $client->setIp($ip));
         $this->assertEquals($handler, $client->getRequestHandler());
 
         $this->assertEquals([
@@ -69,67 +90,77 @@ class IpTest extends TestCase
     }
 
     /** @test */
-    public function get_original_success_test()
-    {
-        $ip = '127.0.0.1';
-        $client = \Mockery::mock(IpClient::class)->makePartial();
-
-        // 模拟 ip 服务端获取失败的情况。
-        $handler = \Mockery::mock(RequestHandlerImp::class);
-        $handler->shouldReceive('send')->andReturn($this->data);
-
-        $client->shouldReceive('setIp')->with($ip)->andReturn($client);
-        $client->shouldReceive('getIp')->andReturn($ip);
-
-        $client->shouldReceive('getRequestHandler')->andReturn($handler);
-
-        $this->assertEquals($ip, $client->getIp());
-        $this->assertEquals($client, $client->setIp($ip));
-        $this->assertEquals($handler, $client->getRequestHandler());
-
-        $this->assertEquals($this->data, $client->getOriginalInfo());
-    }
-
-    /** @test */
     public function mock_client_try_test()
     {
         $ip = '127.0.0.1';
         $client = \Mockery::mock(IpClient::class)->makePartial();
-
         $httpClient = \Mockery::mock(ClientInterface::class);
-        $client->useProvider('taobao');
-
         $taobao = \Mockery::mock(TaobaoIp::class);
+        $handler = \Mockery::mock(RequestHandler::class)->makePartial();
+
         $exception = new ServerErrorException;
 
-        $taobao->expects()->send()->with($httpClient, $ip)->times(2)->andThrow($exception);
-        $taobao->expects()->send()->with($httpClient, $ip)->times(1)->andReturn($this->data);
+        $taobao->expects()->send($httpClient, $ip)->times(3)->andThrow($exception);
+        $taobao->expects()->send()->with($httpClient, $ip)->once()->andReturn($this->data);
 
         // 模拟 ip 服务端获取失败的情况。
-        $handler = \Mockery::mock(RequestHandler::class)->makePartial();
         $handler->shouldReceive('getClient')->andReturn($httpClient);
 
-        $client->shouldReceive('setIp')->with($ip)->andReturn($client);
-        $client->shouldReceive('getIp')->andReturn($ip);
         $client->shouldReceive('getRequestHandler')->andReturn($handler);
 
-        $client->shouldReceive('resolveProviders')->andReturn(['taobao' => $taobao]);
+        $client->setIp($ip)->useProvider('taobao')->bound('taobao', $taobao);
 
-        $this->assertEquals(array_merge($this->data, [
-            'provider' => 'taobao',
-            'success'  => 1,
-        ]), $client->getOriginalInfo());
+        $this->assertEquals([
+            'message'  => '获取 ip 信息失败',
+            'success'  => 0,
+        ], $client->getOriginalInfo());
     }
 
-//    /** @test */
-//    public function test_get_ip()
-//    {
-//        $ip = '117.149.174.132';
-//        $client = new IpClient();
-//        $client->useProvider('taobao')->setProviderConfig('baidu', ['ak' => 'swXuvzN8SoZeQUwcV1mtcMQhjAEMDyq5']);
-//        $client->setIp($ip);
-//        var_dump($client->getOriginalInfo());
-//    }
+    /** @test */
+    public function mock_client_try_times_test()
+    {
+        $ip = '127.0.0.1';
+        $client = \Mockery::mock(IpClient::class)->makePartial();
+        $handler = \Mockery::mock(RequestHandler::class)->makePartial();
+        $httpClient = \Mockery::mock(ClientInterface::class);
+        $taobao = \Mockery::mock(IpImp::class);
+
+        $exception = new ServerErrorException;
+        $taobao->expects()->send($httpClient, $ip)->times(9)->andThrow($exception);
+        $taobao->expects()->send()->with($httpClient, $ip)->once()->andReturn($this->data);
+
+        // 模拟 ip 服务端获取失败的情况。
+        $handler->shouldReceive('getClient')->andReturn($httpClient);
+
+        $client->shouldReceive('getRequestHandler')->andReturn($handler);
+        $client->useProvider('taobao')->bound('taobao', $taobao);
+
+        $client->setIp($ip)->try(3);
+        $this->assertEquals(['success' => 0, 'message' => '获取 ip 信息失败'], $client->getOriginalInfo());
+
+        $client->setIp($ip)->try(7);
+        $this->assertEquals($this->data, $client->getOriginalInfo());
+    }
+
+    /** @test */
+    public function null_object_test()
+    {
+        $ip = '127.0.0.1';
+        $client = \Mockery::mock(IpClient::class)->makePartial();
+
+        $client->setIp($ip);
+
+        $client->shouldReceive('getOriginalInfo')->andReturn(['success' => 0]);
+
+        $client->shouldReceive('getCity')->andReturn($client->getDataMapper()->getCity());
+        $client->shouldReceive('getDuc')->andReturn($client->getDataMapper()->getDuc());
+        $client->shouldReceive('getDuc')->andReturn($client->getDataMapper()->getDuc());
+
+        $this->assertInstanceOf(NullDataMapper::class, $client->getDataMapper());
+
+        $this->assertEquals('', $client->getCity());
+        $this->assertEquals('', $client->getDuc());
+    }
 
     /** @test */
     public function bound_test()
@@ -139,7 +170,11 @@ class IpTest extends TestCase
 
         $client->bound('taobao', $taobao);
 
-        $this->assertSame($client->getInstanceByName('taobao'), $taobao);
+        $instances = $client->resolveProviders();
+
+        $this->assertEquals(2, count($instances));
+
+        $this->assertSame($taobao, $instances['taobao']);
     }
 
     /** @test */

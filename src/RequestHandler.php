@@ -19,21 +19,7 @@ class RequestHandler implements RequestHandlerImp
     /**
      * @var int
      */
-    public $tryTimes = 3;
-
-    /**
-     * @param int $tryTimes
-     *
-     * @return $this
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function setTryTimes(int $tryTimes)
-    {
-        $this->tryTimes = $tryTimes;
-
-        return $this;
-    }
+    protected $tryTimes = 3;
 
     /**
      * @return ClientInterface
@@ -59,7 +45,7 @@ class RequestHandler implements RequestHandlerImp
     public function send($providers, $ip)
     {
         foreach ($providers as $name => $provider) {
-            for ($time = 1; $time <= $this->tryTimes; $time++) {
+            for ($time = 1; $time <= $this->getTryTimes(); $time++) {
                 try {
                     /** @var IpImp $provider */
                     return array_merge($provider->send($this->getClient(), $ip), [
@@ -76,4 +62,27 @@ class RequestHandler implements RequestHandlerImp
 
         throw new ServerErrorException();
     }
+
+    /**
+     * @return int
+     */
+    public function getTryTimes(): int
+    {
+        return $this->tryTimes;
+    }
+
+    /**
+     * @param int $tryTimes
+     *
+     * @return $this
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function setTryTimes(int $tryTimes)
+    {
+        $this->tryTimes = $tryTimes;
+
+        return $this;
+    }
+
 }

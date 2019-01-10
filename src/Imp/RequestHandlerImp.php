@@ -11,4 +11,6 @@ interface RequestHandlerImp
     public function getClient(): ClientInterface;
 
     public function setTryTimes(int $times);
+
+    public function getTryTimes(): int;
 }
