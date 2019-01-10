@@ -90,6 +90,8 @@ class IpTest extends TestCase
     {
         $ip = '127.0.0.1';
         $client = \Mockery::mock(IpClient::class)->makePartial();
+
+        /** @var RequestHandlerImp $handler */
         $handler = \Mockery::mock(RequestHandlerImp::class);
 
         $exception = new ServerErrorException;
@@ -192,6 +194,8 @@ class IpTest extends TestCase
         $client = \Mockery::mock(IpClient::class)->makePartial();
         $httpClient = \Mockery::mock(ClientInterface::class);
         $taobao = \Mockery::mock(TaobaoIp::class);
+
+        /** @var RequestHandler $handler */
         $handler = \Mockery::mock(RequestHandler::class)->makePartial();
 
         $exception = new ServerErrorException;
@@ -224,6 +228,8 @@ class IpTest extends TestCase
     {
         $ip = '127.0.0.1';
         $client = \Mockery::mock(IpClient::class)->makePartial();
+
+        /** @var RequestHandler $handler */
         $handler = \Mockery::mock(RequestHandler::class)->makePartial();
         $httpClient = \Mockery::mock(ClientInterface::class);
         $taobao = \Mockery::mock(IpImp::class);
