@@ -90,9 +90,16 @@ class IpTest extends TestCase
     /** @test */
     function set_mapper_test()
     {
-        $this->client->setIp('127.0.0.1');
-        $this->client->setDataMapper(new NullDataMapper());
-        $this->assertInstanceOf(NullDataMapper::class, $this->client->getDataMapper());
+        $client = \Mockery::mock(IpClient::class)->makePartial();
+
+        $client->shouldReceive('getOriginalInfo')->andReturn([
+            'success' => 0,
+            'message' => '',
+        ]);
+
+        $client->setIp('127.0.0.1');
+        $client->setDataMapper(new NullDataMapper());
+        $this->assertInstanceOf(NullDataMapper::class, $client->getDataMapper());
     }
 
     /** @test */
