@@ -7,6 +7,12 @@ A SDK for ip.
 [![Code Coverage](https://scrutinizer-ci.com/g/DuC-cnZj/ip/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/DuC-cnZj/ip/?branch=master)
 ![StyleCI build status](https://github.styleci.io/repos/156356126/shield)
 
+## Support
+
+- baidu api
+- taobao api
+- ali api
+
 ## Installing
 
 ```shell
