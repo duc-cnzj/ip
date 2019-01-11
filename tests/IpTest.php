@@ -2,14 +2,14 @@
 
 namespace DucCnzj\Ip\Tests;
 
-use DucCnzj\Ip\CacheStore;
-use DucCnzj\Ip\Imp\CacheStoreImp;
 use DucCnzj\Ip\IpClient;
 use DucCnzj\Ip\Imp\IpImp;
+use DucCnzj\Ip\CacheStore;
 use DucCnzj\Ip\NullDataMapper;
 use DucCnzj\Ip\RequestHandler;
 use GuzzleHttp\ClientInterface;
 use PHPUnit\Framework\TestCase;
+use DucCnzj\Ip\Imp\CacheStoreImp;
 use DucCnzj\Ip\Strategies\TaobaoIp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
@@ -67,16 +67,16 @@ class IpTest extends TestCase
         parent::setUp();
         $this->client = new IpClient();
     }
-    
+
     /** @test */
-    function get_ip_test()
+    public function get_ip_test()
     {
         $this->expectExceptionMessage('请先设置 ip');
         $this->client->getIp();
     }
 
     /** @test */
-    function get_provider_config_test()
+    public function get_provider_config_test()
     {
         $this->assertEquals([], $this->client->getProviderConfig('baidu'));
 
@@ -88,7 +88,7 @@ class IpTest extends TestCase
     }
 
     /** @test */
-    function set_mapper_test()
+    public function set_mapper_test()
     {
         $client = \Mockery::mock(IpClient::class)->makePartial();
 
@@ -103,15 +103,15 @@ class IpTest extends TestCase
     }
 
     /** @test */
-    function set_request_handler_test()
+    public function set_request_handler_test()
     {
         $handler = \Mockery::mock(RequestHandlerImp::class);
         $this->client->setRequestHandler($handler);
         $this->assertInstanceOf(RequestHandlerImp::class, $this->client->getRequestHandler());
     }
-    
+
     /** @test */
-    function set_cache_store_test()
+    public function set_cache_store_test()
     {
         $store = \Mockery::mock(CacheStoreImp::class);
         $this->client->setCacheStore($store);
@@ -119,7 +119,7 @@ class IpTest extends TestCase
     }
 
     /** @test */
-    function use_method_test()
+    public function use_method_test()
     {
         $this->client->use('');
         $this->assertEquals(['baidu', 'taobao'], $this->client->getProviders());

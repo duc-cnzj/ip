@@ -8,7 +8,6 @@ use DucCnzj\Ip\Imp\CacheStoreImp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
-use DucCnzj\Ip\Exceptions\NetworkErrorException;
 use DucCnzj\Ip\Exceptions\IpProviderClassNotExistException;
 
 /**
@@ -250,7 +249,7 @@ class IpClient
      */
     public function getIp()
     {
-        if (is_null($this->ip)) {
+        if (! $this->ip) {
             throw new \Exception('请先设置 ip');
         }
 
