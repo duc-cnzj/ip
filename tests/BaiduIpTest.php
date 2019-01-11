@@ -5,7 +5,6 @@ namespace DucCnzj\Ip\Tests;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Strategies\BaiduIp;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;

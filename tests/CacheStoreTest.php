@@ -2,8 +2,8 @@
 
 namespace DucCnzj\Ip\Tests;
 
-use DucCnzj\Ip\CacheStore;
 use DucCnzj\Ip\IpClient;
+use DucCnzj\Ip\CacheStore;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Imp\CacheStoreImp;
 
@@ -100,7 +100,7 @@ class CacheStoreTest extends TestCase
     }
 
     /** @test */
-    function test_put_many()
+    public function test_put_many()
     {
         $this->store->putMany(['name'=>'duc', 'age' => 18]);
 
@@ -108,7 +108,7 @@ class CacheStoreTest extends TestCase
     }
 
     /** @test */
-    function test_get_all_items()
+    public function test_get_all_items()
     {
         $this->store->putMany(['name'=>'duc', 'age' => 18]);
 
