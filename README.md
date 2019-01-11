@@ -10,7 +10,7 @@ A SDK for ip.
 ## Installing
 
 ```shell
-$ composer require duccnzj/ip -vvv
+$ composer require duc_cnzj/ip -vvv
 ```
 
 ## Usage
@@ -68,9 +68,9 @@ when getXXX() false it will return null, u can use `$client->getErrors()` get er
 
 alias
 ```php
-$client->use('taobao', 'baidu'); 
+$client->use('taobao', 'baidu');
 # Equals to
-$client->useProvider('taobao', 'baidu'); 
+$client->useProvider('taobao', 'baidu');
 ```
 
 other methods
