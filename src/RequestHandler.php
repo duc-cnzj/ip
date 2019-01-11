@@ -6,8 +6,8 @@ use GuzzleHttp\Client;
 use DucCnzj\Ip\Imp\IpImp;
 use GuzzleHttp\ClientInterface;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
+use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
-use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 
 class RequestHandler implements RequestHandlerImp
 {
@@ -69,7 +69,7 @@ class RequestHandler implements RequestHandlerImp
                     $this->errors[] = $e->getMessage();
 
                     continue;
-                } catch (InvalidArgumentException $exception) {
+                } catch (BreakLoopException $exception) {
                     $this->errors[] = $exception->getMessage();
 
                     continue 2;

@@ -265,6 +265,7 @@ class IpClient
     {
         return [
             'baidu',
+            'ali',
             'taobao',
         ];
     }

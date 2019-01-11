@@ -28,12 +28,16 @@ $client->setIp('xxx.xxx.xxx.xxx');
 $client->getCity();
 $client->city;
 
-# use Provider (baidu, taobao)
+# use Provider (baidu, taobao, ali)
 $client = new IpClient();
 
 # if use baidu api, you need provide ak secret.
 $client->useProvider('baidu')
     ->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
+
+# if use ali api, you need provide ak secret.
+$client->useProvider('ali')
+    ->setProviderConfig('ali', ['app_code' => 'xxxxxxxxxxxx']);
 
 # if use taobao.
 $client->useProvider('taobao');
@@ -50,9 +54,12 @@ $client->setIp('xxx.xxx.xxx.xxx')->try(10);
 
 extra property
 ```php
-# baidu return point_x and point_y, so you can:
+# baidu/ali return point_x and point_y, so you can:
 $client->useProvider('baidu')
     ->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
+
+$client->useProvider('ali')
+    ->setProviderConfig('ali', ['app_code' => 'xxxxxxxxxxxx']);
 
 $client->getPointX();
 $client->getPointY();

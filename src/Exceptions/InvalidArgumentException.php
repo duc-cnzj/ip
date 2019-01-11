@@ -4,7 +4,7 @@ namespace DucCnzj\Ip\Exceptions;
 
 use Throwable;
 
-class InvalidArgumentException extends Exception
+class InvalidArgumentException extends BreakLoopException
 {
     public function __construct($message = '参数验证失败', $code = 0, Throwable $previous = null)
     {
