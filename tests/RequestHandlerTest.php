@@ -2,14 +2,14 @@
 
 namespace DucCnzj\Ip\Tests;
 
-use DucCnzj\Ip\Exceptions\ServerErrorException;
 use GuzzleHttp\Client;
 use DucCnzj\Ip\RequestHandler;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Strategies\TaobaoIp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
-use GuzzleHttp\Exception\ConnectException;
 use Psr\Http\Message\RequestInterface;
+use GuzzleHttp\Exception\ConnectException;
+use DucCnzj\Ip\Exceptions\ServerErrorException;
 
 class RequestHandlerTest extends TestCase
 {
