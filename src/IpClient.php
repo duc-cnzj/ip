@@ -34,7 +34,7 @@ class IpClient
     protected $providerConfig = [];
 
     /**
-     * @var array ['baidu', 'taobao']
+     * @var array|null ['baidu', 'taobao']
      */
     protected $providers = [];
 
@@ -221,6 +221,10 @@ class IpClient
      */
     public function getProviders()
     {
+        if (is_null($this->providers)) {
+            return [];
+        }
+
         if (count($this->providers) === 0) {
             return $this->providers = $this->getDefaultProviders();
         }
@@ -311,17 +315,16 @@ class IpClient
     }
 
     /**
-     * @param string $provider
+     * @param string[] ...$provider
      *
      * @return $this
      *
      * @author duc <1025434218@qq.com>
      */
-    public function useProvider(string $provider)
+    public function useProvider(string ...$provider)
     {
-        $this->providers[] = $provider;
-
-        $this->providers = array_unique($this->providers);
+        $providers = array_merge($this->providers ?? [], array_filter($provider));
+        $this->providers = array_unique($providers);
 
         return $this;
     }
@@ -399,15 +402,27 @@ class IpClient
     }
 
     /**
-     * @param string $provider
+     * @param string[] ...$provider
      *
      * @return IpClient
      *
      * @author duc <1025434218@qq.com>
      */
-    public function use(string $provider)
+    public function use(string ...$provider)
     {
-        return $this->useProvider($provider);
+        return $this->useProvider(...$provider);
+    }
+
+    /**
+     * @return $this
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function clearUse()
+    {
+        $this->providers = null;
+
+        return $this;
     }
 
     /**
