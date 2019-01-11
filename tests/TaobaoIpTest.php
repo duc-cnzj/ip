@@ -55,4 +55,36 @@ class TaobaoIpTest extends TestCase
 
         $this->server->send($guzzleClient, $ip);
     }
+
+    /** @test */
+    public function test_server_exception()
+    {
+        $ip = '127.0.0.1';
+
+        $this->expectException(ServerErrorException::class);
+
+        $serverException = \Mockery::mock(ServerException::class);
+
+        $guzzleClient = \Mockery::mock(Client::class);
+        $guzzleClient->shouldReceive('request')->with('get', $this->url . '?ip=' . $ip)
+            ->andThrow($serverException);
+
+        $this->server->send($guzzleClient, $ip);
+    }
+
+    /** @test */
+    public function test_server_error_exception()
+    {
+        $ip = '127.0.0.1';
+
+        $this->expectException(ServerErrorException::class);
+
+        $guzzleClient = \Mockery::mock(Client::class);
+        $response = \Mockery::mock(ResponseInterface::class);
+        $guzzleClient->shouldReceive('request')->with('get', $this->url . '?ip=' . $ip)
+            ->andReturn($response);
+        $response->shouldReceive('getBody')->andReturn(json_encode(['code' => 1]));
+
+        $this->server->send($guzzleClient, $ip);
+    }
 }

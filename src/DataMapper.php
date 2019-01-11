@@ -108,9 +108,9 @@ class DataMapper implements DataMapImp
 
     /**
      * @param string $name
-     * @param mixed $arguments
+     * @param        $arguments
      *
-     * @return mixed|string
+     * @return string
      * @throws MethodNotExistException
      *
      * @author duc <1025434218@qq.com>
@@ -125,9 +125,7 @@ class DataMapper implements DataMapImp
             return $this->getField($field);
         }
 
-        if (! method_exists($this, $name)) {
-            throw new MethodNotExistException("{$name} 方法不存在");
-        }
+        throw new MethodNotExistException("{$name} 方法不存在");
     }
 
     /**

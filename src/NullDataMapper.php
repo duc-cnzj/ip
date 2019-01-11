@@ -33,13 +33,13 @@ class NullDataMapper implements DataMapImp
     }
 
     /**
-     * @return string
+     * @return string|null
      *
      * @author duc <1025434218@qq.com>
      */
-    public function getIp(): string
+    public function getIp()
     {
-        return $this->info['ip'];
+        return isset($this->info['ip']) ? $this->info['ip'] : null;
     }
 
     /**
@@ -115,9 +115,7 @@ class NullDataMapper implements DataMapImp
             return isset($this->info[$field]) ? $this->info[$field] : null;
         }
 
-        if (! method_exists($this, $name)) {
-            throw new MethodNotExistException("{$name} 方法不存在");
-        }
+        throw new MethodNotExistException("{$name} 方法不存在");
     }
 
     /**

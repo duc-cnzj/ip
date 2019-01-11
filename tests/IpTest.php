@@ -2,6 +2,8 @@
 
 namespace DucCnzj\Ip\Tests;
 
+use DucCnzj\Ip\CacheStore;
+use DucCnzj\Ip\Imp\CacheStoreImp;
 use DucCnzj\Ip\IpClient;
 use DucCnzj\Ip\Imp\IpImp;
 use DucCnzj\Ip\NullDataMapper;
@@ -65,6 +67,59 @@ class IpTest extends TestCase
         parent::setUp();
         $this->client = new IpClient();
     }
+    
+    /** @test */
+    function get_ip_test()
+    {
+        $this->expectExceptionMessage('请先设置 ip');
+        $this->client->getIp();
+    }
+
+    /** @test */
+    function get_provider_config_test()
+    {
+        $this->assertEquals([], $this->client->getProviderConfig('baidu'));
+
+        $this->client->setProviderConfig('baidu', ['secret' => 'xxxxxxxx']);
+
+        $this->assertSame($this->client, $this->client->setProviderConfig('baidu', ['secret' => 'xxxxxxxx']));
+
+        $this->assertEquals(['secret' => 'xxxxxxxx'], $this->client->getProviderConfig('baidu'));
+    }
+
+    /** @test */
+    function set_mapper_test()
+    {
+        $this->client->setIp('127.0.0.1');
+        $this->client->setDataMapper(new NullDataMapper());
+        $this->assertInstanceOf(NullDataMapper::class, $this->client->getDataMapper());
+    }
+
+    /** @test */
+    function set_request_handler_test()
+    {
+        $handler = \Mockery::mock(RequestHandlerImp::class);
+        $this->client->setRequestHandler($handler);
+        $this->assertInstanceOf(RequestHandlerImp::class, $this->client->getRequestHandler());
+    }
+    
+    /** @test */
+    function set_cache_store_test()
+    {
+        $store = \Mockery::mock(CacheStoreImp::class);
+        $this->client->setCacheStore($store);
+        $this->assertInstanceOf(CacheStoreImp::class, $this->client->getCacheStore());
+    }
+
+    /** @test */
+    function use_method_test()
+    {
+        $this->client->use('taobao');
+        $this->assertEquals(['taobao'], $this->client->getProviders());
+
+        $this->client->useProvider('baidu');
+        $this->assertEquals(['taobao', 'baidu'], $this->client->getProviders());
+    }
 
     /** @test */
     public function test_get_errors()
@@ -102,31 +157,31 @@ class IpTest extends TestCase
     }
 
     /** @test */
-    public function get_original_success_test()
+    public function get_original_from_cache()
     {
         $ip = '127.0.0.1';
         $client = \Mockery::mock(IpClient::class)->makePartial();
 
+        $cacheStore = \Mockery::mock(CacheStore::class)->makePartial();
+
         /** @var RequestHandlerImp $handler */
         $handler = \Mockery::mock(RequestHandlerImp::class);
 
-        $exception = new ServerErrorException;
-
         // 模拟 ip 服务端获取失败的情况。
-        $handler->shouldReceive('send')->andThrow($exception);
+        $handler->shouldReceive('send')->andReturn($this->data);
 
         $client->shouldReceive('getRequestHandler')->andReturn($handler);
+        $client->shouldReceive('getCacheStore')->andReturn($cacheStore);
 
         $client->setIp($ip);
         $this->assertEquals($ip, $client->getIp());
 
         $this->assertEquals(
-            [
-                'success' => 0,
-                'message' => '获取 ip 信息失败',
-            ],
+            $this->data,
             $client->getOriginalInfo()
         );
+
+        $this->assertEquals($this->data, $client->getCacheStore()->get($ip));
     }
 
     /** @test */
@@ -170,8 +225,8 @@ class IpTest extends TestCase
                 ->getAddress()
         );
         $client->shouldReceive('getCity')->andReturn($client->getDataMapper()->getCity());
-
         $client->setIp($ip);
+
         $this->assertEquals($ip, $client->getIp());
 
         $this->assertEquals($this->data, $client->getOriginalInfo());

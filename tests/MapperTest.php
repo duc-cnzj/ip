@@ -3,6 +3,7 @@
 namespace DucCnzj\Ip\Tests;
 
 use DucCnzj\Ip\DataMapper;
+use DucCnzj\Ip\Imp\DataMapImp;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Exceptions\MethodNotExistException;
 
@@ -19,28 +20,40 @@ class MapperTest extends TestCase
         'isp'     => '移动',
     ];
 
+    /**
+     * @var DataMapImp
+     */
+    protected $mapper;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->mapper = new DataMapper();
+    }
+
     /** @test */
     public function mapper_test()
     {
-        $map = new DataMapper();
-        $map->setInfo($this->data);
+        $this->mapper->setInfo($this->data);
 
-        $this->assertEquals('127.0.0.1', $map->getIp());
+        $this->assertEquals('127.0.0.1', $this->mapper->getIp());
 
-        $this->assertEquals('中国浙江绍兴', $map->getAddress());
+        $this->assertEquals('中国浙江绍兴', $this->mapper->getAddress());
 
-        $this->assertEquals('绍兴', $map->getCity());
+        $this->assertEquals('绍兴', $this->mapper->getCity());
 
-        $this->assertEquals('中国', $map->getCountry());
+        $this->assertEquals('中国', $this->mapper->getCountry());
 
-        $this->assertEquals('浙江', $map->getRegion());
+        $this->assertEquals('浙江', $this->mapper->getRegion());
 
-        $this->assertEquals('移动', $map->getIsp());
+        $this->assertEquals('移动', $this->mapper->getIsp());
 
-        $this->assertEquals('10.00', $map->getPointX());
+        $this->assertEquals('10.00', $this->mapper->getPointX());
+        $this->assertTrue($this->mapper->hasInfo());
 
-        $this->assertEquals('', $map->getDuc());
-        $this->assertEquals('', $map->duc);
+        $this->assertEquals('', $this->mapper->getDuc());
+        $this->assertEquals('', $this->mapper->duc);
     }
 
     /** @test */
@@ -48,10 +61,8 @@ class MapperTest extends TestCase
     {
         $this->expectException(MethodNotExistException::class);
 
-        $map = new DataMapper();
+        $this->mapper->setInfo($this->data);
 
-        $map->setInfo($this->data);
-
-        $map->duc();
+        $this->mapper->duc();
     }
 }

@@ -40,7 +40,7 @@ $client->useProvider('taobao');
 # default use both baidu and taobao. if you want use both, pls set baidu ak secret.
 $client->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
 
-# package will try 3 times when provider response error. use try to reset tryTimes.
+# package will try 3 times when provider response error. use try method to reset tryTimes.
 $client->setIp('xxx.xxx.xxx.xxx')->try(10);
 
 # in laravel

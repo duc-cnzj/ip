@@ -5,10 +5,12 @@ namespace DucCnzj\Ip\Tests;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Strategies\BaiduIp;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
+use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 
 class BaiduIpTest extends TestCase
 {
@@ -64,5 +66,29 @@ class BaiduIpTest extends TestCase
             ->andThrowExceptions([$clientException, $serverException]);
 
         $this->server->send($guzzleClient, $ip);
+    }
+
+    /** @test */
+    public function invalid_argument_exception_test()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $guzzle = \Mockery::mock(Client::class);
+        $response = \Mockery::mock(ResponseInterface::class);
+        $guzzle->shouldReceive('request')->andReturn($response);
+        $response->shouldReceive('getBody')->andReturn(json_encode(['status' => 1, 'message' => '请输入 ak。']));
+
+        $this->server->send($guzzle, '127.0.0.1');
+    }
+
+    /** @test */
+    public function server_exception_test()
+    {
+        $this->expectException(ServerErrorException::class);
+        $guzzle = \Mockery::mock(Client::class);
+
+        $guzzleServerException = \Mockery::mock(ServerException::class);
+        $guzzle->shouldReceive('request')->andThrow($guzzleServerException);
+
+        $this->server->send($guzzle, '127.0.0.1');
     }
 }

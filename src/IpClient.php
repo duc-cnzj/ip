@@ -195,11 +195,11 @@ class IpClient
                 ->send($this->resolveProviders(), $this->getIp());
         } catch (ServerErrorException $e) {
             return $this->responseWithError($e->getMessage());
-        } catch (NetworkErrorException $e) {
+        } catch (\Exception $e) {
             return $this->responseWithError($e->getMessage());
         }
 
-        $this->cacheStore->put($this->getIp(), $result);
+        $this->getCacheStore()->put($this->getIp(), $result);
 
         return $result;
     }

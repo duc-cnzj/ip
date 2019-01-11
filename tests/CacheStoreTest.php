@@ -2,12 +2,28 @@
 
 namespace DucCnzj\Ip\Tests;
 
+use DucCnzj\Ip\CacheStore;
 use DucCnzj\Ip\IpClient;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Imp\CacheStoreImp;
 
 class CacheStoreTest extends TestCase
 {
+    /**
+     * @var CacheStoreImp
+     */
+    protected $store;
+
+    /**
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->store = new CacheStore();
+    }
+
     /** @test */
     public function cache_store_test()
     {
@@ -75,5 +91,27 @@ class CacheStoreTest extends TestCase
         $cacheStore = $client->getCacheStore();
 
         $this->assertEquals('', $cacheStore->getPrefix());
+    }
+
+    /** @test */
+    public function cache_store_test_many()
+    {
+        $this->assertEquals([null, null], $this->store->many(['duc', 'abc']));
+    }
+
+    /** @test */
+    function test_put_many()
+    {
+        $this->store->putMany(['name'=>'duc', 'age' => 18]);
+
+        $this->assertCount(2, $this->store);
+    }
+
+    /** @test */
+    function test_get_all_items()
+    {
+        $this->store->putMany(['name'=>'duc', 'age' => 18]);
+
+        $this->assertEquals(['name'=>'duc', 'age' => 18], $this->store->getAllItems());
     }
 }
