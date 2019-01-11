@@ -2,12 +2,11 @@
 
 namespace DucCnzj\Ip\Tests;
 
-use DucCnzj\Ip\DataMapper;
 use DucCnzj\Ip\NullDataMapper;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Exceptions\MethodNotExistException;
 
-class NullDapperTest extends TestCase
+class NullDataMapperTest extends TestCase
 {
     /**
      * @var NullDataMapper
@@ -35,11 +34,10 @@ class NullDapperTest extends TestCase
 
         $this->mapper->setInfo(['ip' => $this->ip]);
         $this->assertEquals($this->ip, $this->mapper->getIp());
-
     }
 
     /** @test */
-    function null_object_get_test()
+    public function null_object_get_test()
     {
         $this->assertNull($this->mapper->duc);
         $this->assertNull($this->mapper->getDuc());
