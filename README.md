@@ -88,7 +88,7 @@ $client->useProvider('taobao', 'baidu');
 
 other methods
 ```php
-$client->cliearUse(); # will clear providers;
+$client->clearUse(); # will clear providers;
 
 # custom your instance. need implement DucCnzj\Ip\Imp\IpImp;
 $client->bound('taobao', $taobao);
