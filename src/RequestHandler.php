@@ -7,7 +7,6 @@ use DucCnzj\Ip\Imp\IpImp;
 use GuzzleHttp\ClientInterface;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
-use DucCnzj\Ip\Exceptions\NetworkErrorException;
 use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 
 class RequestHandler implements RequestHandlerImp
@@ -52,7 +51,6 @@ class RequestHandler implements RequestHandlerImp
      * @param string $ip
      *
      * @return array
-     * @throws NetworkErrorException
      * @throws ServerErrorException
      *
      * @author duc <1025434218@qq.com>
