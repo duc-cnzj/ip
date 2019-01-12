@@ -5,14 +5,14 @@ namespace DucCnzj\Ip\Tests;
 use DucCnzj\Ip\IpClient;
 use DucCnzj\Ip\Imp\IpImp;
 use DucCnzj\Ip\CacheStore;
-use DucCnzj\Ip\Strategies\AliIp;
-use DucCnzj\Ip\Strategies\BaiduIp;
 use Mockery\MockInterface;
 use DucCnzj\Ip\NullDataMapper;
 use DucCnzj\Ip\RequestHandler;
 use GuzzleHttp\ClientInterface;
 use PHPUnit\Framework\TestCase;
+use DucCnzj\Ip\Strategies\AliIp;
 use DucCnzj\Ip\Imp\CacheStoreImp;
+use DucCnzj\Ip\Strategies\BaiduIp;
 use DucCnzj\Ip\Strategies\TaobaoIp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
@@ -526,7 +526,6 @@ class IpTest extends TestCase
         $ali->shouldReceive('send')->andThrow($exception);
         $taobao->shouldReceive('send')->andThrow($exception);
         $baidu->shouldReceive('send')->andThrow($exception);
-
 
         $client->use('ali', 'baidu', 'taobao');
         $client->setProviderConfig('ali', 'appcode');
