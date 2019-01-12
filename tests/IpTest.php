@@ -125,7 +125,7 @@ class IpTest extends TestCase
     public function use_method_test()
     {
         $this->client->use('');
-        $this->assertEquals(['baidu', 'ali', 'taobao'], $this->client->getProviders());
+        $this->assertEquals(['baidu', 'ali', 'tencent', 'taobao'], $this->client->getProviders());
 
         $this->client->clearUse();
         $this->assertEquals([], $this->client->getProviders());
@@ -384,7 +384,7 @@ class IpTest extends TestCase
 
         $instances = $client->resolveProviders();
 
-        $this->assertEquals(3, count($instances));
+        $this->assertEquals(4, count($instances));
 
         $this->assertSame($taobao, $instances['taobao']);
     }
@@ -417,7 +417,7 @@ class IpTest extends TestCase
 
         $providers = $client->getProviders();
 
-        $this->assertEquals(['baidu', 'ali', 'taobao'], $providers);
+        $this->assertEquals(['baidu', 'ali', 'tencent', 'taobao'], $providers);
     }
 
     /** @test */

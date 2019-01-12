@@ -9,9 +9,10 @@ A SDK for ip.
 
 ## Support
 
-- baidu api
+- [baidu api](http://lbsyun.baidu.com/index.php?title=webapi/ip-api)
 - taobao api
-- ali api
+- [ali api](https://market.aliyun.com/products/57002002/cmapi018957.html?spm=5176.730005.productlist.d_cmapi018957.6f613524XYMOwf&innerSource=search_ip#sku=yuncode1295700000)
+- [tencent api](https://lbs.qq.com/webservice_v1/guide-ip.html)
 
 ## Installing
 
@@ -43,6 +44,13 @@ $client->useProvider('baidu')
 # or 
 $client->useProvider('baidu')
     ->setProviderConfig('baidu', 'xxxxxxxxxxxx');
+
+# if use tencent api, you need provide ak secret.
+$client->useProvider('tencent')
+    ->setProviderConfig('tencent', ['key' => 'xxxxxxxxxxxx']);
+# or 
+$client->useProvider('tencent')
+    ->setProviderConfig('tencent', 'xxxxxxxxxxxx');
     
 
 # if use ali api, you need provide ak secret.
@@ -52,8 +60,9 @@ $client->useProvider('ali')
 # if use taobao.
 $client->useProvider('taobao');
 
-# default use both baidu and taobao. if you want use both, pls set baidu ak secret.
+# default use all provider. if you want use all, pls set secret for each provider.
 $client->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
+$client->setProviderConfig('ali', 'xxxxxxxxxxxx');
 
 # package will try 3 times when provider response error. use try method to reset tryTimes.
 $client->setIp('xxx.xxx.xxx.xxx')->try(10);
@@ -64,12 +73,15 @@ $client->setIp('xxx.xxx.xxx.xxx')->try(10);
 
 extra property
 ```php
-# baidu/ali return point_x and point_y, so you can:
+# baidu/ali/tencent return point_x and point_y, so you can:
 $client->useProvider('baidu')
     ->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
 
 $client->useProvider('ali')
     ->setProviderConfig('ali', ['app_code' => 'xxxxxxxxxxxx']);
+
+$client->useProvider('tencent')
+    ->setProviderConfig('tencent', 'xxxxxxxxxxxx');
 
 $client->getPointX();
 $client->getPointY();

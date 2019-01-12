@@ -19,7 +19,7 @@ class BaiduIp implements IpImp
     /**
      * @var string
      */
-    protected $url = 'http://api.map.baidu.com/location/ip';
+    protected $url = 'https://api.map.baidu.com/location/ip';
 
     /**
      * BaiduIp constructor.

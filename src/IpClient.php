@@ -267,6 +267,7 @@ class IpClient
         return [
             'baidu',
             'ali',
+            'tencent',
             'taobao',
         ];
     }
