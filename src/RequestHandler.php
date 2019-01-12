@@ -66,15 +66,15 @@ class RequestHandler implements RequestHandlerImp
                         'success'  => 1,
                     ]);
                 } catch (ServerErrorException $e) {
-                    $this->errors[] = $e->getMessage();
+                    $this->logError($name, $e);
 
                     continue;
-                } catch (BreakLoopException $exception) {
-                    $this->errors[] = $exception->getMessage();
+                } catch (BreakLoopException $e) {
+                    $this->logError($name, $e);
 
                     continue 2;
                 } catch (\Exception $e) {
-                    $this->errors[] = $e->getMessage();
+                    $this->logError($name, $e);
 
                     break 2;
                 }
@@ -104,5 +104,16 @@ class RequestHandler implements RequestHandlerImp
         $this->tryTimes = $tryTimes;
 
         return $this;
+    }
+
+    /**
+     * @param string     $name
+     * @param \Exception $e
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function logError(string $name, \Exception $e): void
+    {
+        $this->errors[] = "provider: {$name}. " . $e->getMessage();
     }
 }

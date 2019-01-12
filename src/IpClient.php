@@ -94,25 +94,28 @@ class IpClient
      */
     public function resolveProviders()
     {
+        $providerInstance = [];
+
         foreach ($this->getProviders() as $provider) {
             if (! isset($this->instances[$provider])) {
                 $this->instances[$provider] = $this->createProvider($provider);
             }
+
+            $providerInstance[$provider] = $this->instances[$provider];
         }
 
-        return $this->instances;
+        return $providerInstance;
     }
 
     /**
-     * @param $provider
+     * @param string $provider
      *
      * @return IpImp
-     *
      * @throws IpProviderClassNotExistException
      *
      * @author duc <1025434218@qq.com>
      */
-    public function createProvider($provider)
+    public function createProvider(string $provider)
     {
         $config = $this->getProviderConfig($provider);
 
@@ -128,13 +131,13 @@ class IpClient
     }
 
     /**
-     * @param $msg
+     * @param string $msg
      *
      * @return array
      *
      * @author duc <1025434218@qq.com>
      */
-    public function responseWithError($msg)
+    public function responseWithError(string $msg)
     {
         return [
             'success' => 0,
@@ -179,7 +182,7 @@ class IpClient
     }
 
     /**
-     * @return array
+     * @return array|mixed
      *
      * @author duc <1025434218@qq.com>
      */
@@ -193,8 +196,6 @@ class IpClient
             $result = $this->getRequestHandler()
                 ->send($this->resolveProviders(), $this->getIp());
         } catch (ServerErrorException $e) {
-            return $this->responseWithError($e->getMessage());
-        } catch (\Exception $e) {
             return $this->responseWithError($e->getMessage());
         }
 
@@ -330,14 +331,14 @@ class IpClient
     }
 
     /**
-     * @param       $provider
-     * @param array $config
+     * @param string $provider
+     * @param array|string $config
      *
      * @return $this
      *
      * @author duc <1025434218@qq.com>
      */
-    public function setProviderConfig($provider, array $config)
+    public function setProviderConfig(string $provider, $config)
     {
         $this->providerConfig[$provider] = $config;
 

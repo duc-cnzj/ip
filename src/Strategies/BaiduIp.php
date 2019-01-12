@@ -12,7 +12,7 @@ use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 class BaiduIp implements IpImp
 {
     /**
-     * @var
+     * @var string
      */
     protected $ak;
 
@@ -21,21 +21,30 @@ class BaiduIp implements IpImp
      */
     protected $url = 'http://api.map.baidu.com/location/ip';
 
+    /**
+     * BaiduIp constructor.
+     *
+     * @param array $config
+     */
     public function __construct($config = [])
     {
         $this->setConfig($config);
     }
 
     /**
-     * @param array $config
+     * @param array|string $config
      *
      * @return IpImp
      *
      * @author duc <1025434218@qq.com>
      */
-    public function setConfig($config = []): IpImp
+    public function setConfig($config): IpImp
     {
-        $this->ak = isset($config['ak']) ? $config['ak'] : '';
+        if (is_array($config)) {
+            $this->ak = isset($config['ak']) ? $config['ak'] : '';
+        } else {
+            $this->ak = $config;
+        }
 
         return $this;
     }

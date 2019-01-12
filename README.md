@@ -40,6 +40,10 @@ $client = new IpClient();
 # if use baidu api, you need provide ak secret.
 $client->useProvider('baidu')
     ->setProviderConfig('baidu', ['ak' => 'xxxxxxxxxxxx']);
+# or 
+$client->useProvider('baidu')
+    ->setProviderConfig('baidu', 'xxxxxxxxxxxx');
+    
 
 # if use ali api, you need provide ak secret.
 $client->useProvider('ali')
@@ -81,7 +85,7 @@ when getXXX() false it will return null, u can use `$client->getErrors()` get er
 
 alias
 ```php
-$client->use('taobao', 'baidu');
+$client->use('taobao', 'baidu'); # It will be executed in the order you passed it in
 # Equals to
 $client->useProvider('taobao', 'baidu');
 ```

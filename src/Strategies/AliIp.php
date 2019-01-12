@@ -17,16 +17,35 @@ class AliIp implements IpImp
      */
     protected $appCode;
 
+    /**
+     * @var string
+     */
     protected $url = 'http://iploc.market.alicloudapi.com/v3/ip';
 
+    /**
+     * AliIp constructor.
+     *
+     * @param array $config
+     */
     public function __construct($config = [])
     {
         $this->setConfig($config);
     }
 
-    public function setConfig($config = []): IpImp
+    /**
+     * @param array|string $config
+     *
+     * @return IpImp
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function setConfig($config): IpImp
     {
-        $this->appCode = isset($config['app_code']) ? $config['app_code'] : '';
+        if (is_array($config)) {
+            $this->appCode = isset($config['app_code']) ? $config['app_code'] : '';
+        } else {
+            $this->appCode = $config;
+        }
 
         return $this;
     }
@@ -41,6 +60,17 @@ class AliIp implements IpImp
         return $this->appCode;
     }
 
+    /**
+     * @param ClientInterface $client
+     * @param string          $ip
+     *
+     * @return array
+     * @throws AnalysisException
+     * @throws ServerErrorException
+     * @throws UnauthorizedException
+     *
+     * @author duc <1025434218@qq.com>
+     */
     public function send(ClientInterface $client, string $ip): array
     {
         try {
@@ -75,7 +105,15 @@ class AliIp implements IpImp
         }
     }
 
-    public function formatResult($data, $result)
+    /**
+     * @param array $data
+     * @param array $result
+     *
+     * @return array
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function formatResult(array $data, array $result)
     {
         // 116.0119343,39.66127144;116.7829835,40.2164962
         $arr = explode(';', $result['rectangle']);

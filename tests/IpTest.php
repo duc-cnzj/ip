@@ -5,6 +5,9 @@ namespace DucCnzj\Ip\Tests;
 use DucCnzj\Ip\IpClient;
 use DucCnzj\Ip\Imp\IpImp;
 use DucCnzj\Ip\CacheStore;
+use DucCnzj\Ip\Strategies\AliIp;
+use DucCnzj\Ip\Strategies\BaiduIp;
+use Mockery\MockInterface;
 use DucCnzj\Ip\NullDataMapper;
 use DucCnzj\Ip\RequestHandler;
 use GuzzleHttp\ClientInterface;
@@ -170,8 +173,8 @@ class IpTest extends TestCase
         $client->getCity();
 
         $this->assertEquals([
-            '获取 ip 信息失败',
-            '参数验证失败',
+            'provider: taobao. 获取 ip 信息失败',
+            'provider: taobao. 参数验证失败',
         ], $client->getErrors());
     }
 
@@ -506,5 +509,40 @@ class IpTest extends TestCase
 
         $client->setIp($ip1);
         $this->assertEquals($this->data1, $client->getOriginalInfo());
+    }
+
+    /** @test */
+    public function the_order_in_which_methods_are_called()
+    {
+//        $this->expectException(IpProviderClassNotExistException::class);
+        $ip = '127.0.0.1';
+        /** @var IpClient|MockInterface $client */
+        $client = \Mockery::mock(IpClient::class)->makePartial();
+        $baidu = \Mockery::mock(BaiduIp::class);
+        $ali = \Mockery::mock(AliIp::class);
+        $taobao = \Mockery::mock(TaobaoIp::class);
+
+        $exception = new ServerErrorException('获取失败');
+        $ali->shouldReceive('send')->andThrow($exception);
+        $taobao->shouldReceive('send')->andThrow($exception);
+        $baidu->shouldReceive('send')->andThrow($exception);
+
+
+        $client->use('ali', 'baidu', 'taobao');
+        $client->setProviderConfig('ali', 'appcode');
+        $client->setProviderConfig('baidu', 'ak');
+        $client->bound('baidu', $baidu)
+            ->bound('ali', $ali)
+            ->bound('taobao', $taobao)
+            ->try(1);
+
+        $client->setIp($ip);
+
+        $client->getOriginalInfo();
+        $this->assertEquals([
+            'provider: ali. 获取失败',
+            'provider: baidu. 获取失败',
+            'provider: taobao. 获取失败',
+        ], $client->getErrors());
     }
 }
