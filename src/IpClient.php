@@ -275,9 +275,9 @@ class IpClient
     /**
      * @param string $provider
      *
-     * @return array
+     * @return array|string
      */
-    public function getProviderConfig(string $provider): array
+    public function getProviderConfig(string $provider)
     {
         if (! isset($this->providerConfig[$provider])) {
             return [];
