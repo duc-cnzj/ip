@@ -112,7 +112,7 @@ class RequestHandler implements RequestHandlerImp
      *
      * @author duc <1025434218@qq.com>
      */
-    public function logError(string $name, \Exception $e): void
+    public function logError(string $name, \Exception $e)
     {
         $this->errors[] = "provider: {$name}. " . $e->getMessage();
     }
