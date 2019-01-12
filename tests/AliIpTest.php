@@ -37,6 +37,10 @@ class AliIpTest extends TestCase
         $this->server->setConfig(['app_code' => 'xxxxx']);
 
         $this->assertEquals('xxxxx', $this->server->getAppCode());
+
+        $this->server->setConfig('');
+
+        $this->assertEquals('', $this->server->getAppCode());
     }
 
     /** @test */

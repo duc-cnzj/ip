@@ -48,11 +48,6 @@ class IpClient
     protected $dataMapper;
 
     /**
-     * @var null|CacheStoreImp
-     */
-    protected $cacheStore;
-
-    /**
      * @var RequestHandlerImp|null
      */
     protected $requestHandler;
@@ -188,18 +183,12 @@ class IpClient
      */
     public function getOriginalInfo()
     {
-        if ($info = $this->getCacheStore()->get($this->getIp())) {
-            return $info;
-        }
-
         try {
             $result = $this->getRequestHandler()
                 ->send($this->resolveProviders(), $this->getIp());
         } catch (ServerErrorException $e) {
             return $this->responseWithError($e->getMessage());
         }
-
-        $this->getCacheStore()->put($this->getIp(), $result);
 
         return $result;
     }
@@ -230,16 +219,6 @@ class IpClient
         }
 
         return $this->providers;
-    }
-
-    /**
-     * @return CacheStore
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function getDefaultCacheDriver()
-    {
-        return new CacheStore();
     }
 
     /**
@@ -293,11 +272,7 @@ class IpClient
      */
     public function getCacheStore()
     {
-        if ($this->cacheStore instanceof CacheStoreImp) {
-            return $this->cacheStore;
-        }
-
-        return $this->cacheStore = $this->getDefaultCacheDriver();
+        return $this->getRequestHandler()->getCacheStore();
     }
 
     /**
@@ -383,7 +358,7 @@ class IpClient
      */
     public function setCacheStore(CacheStoreImp $cacheStore)
     {
-        $this->cacheStore = $cacheStore;
+        $this->requestHandler = $this->getRequestHandler()->setCacheStore($cacheStore);
 
         return $this;
     }

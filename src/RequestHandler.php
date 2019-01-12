@@ -5,12 +5,15 @@ namespace DucCnzj\Ip;
 use GuzzleHttp\Client;
 use DucCnzj\Ip\Imp\IpImp;
 use GuzzleHttp\ClientInterface;
+use DucCnzj\Ip\Traits\CacheResponse;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 
 class RequestHandler implements RequestHandlerImp
 {
+    use CacheResponse;
+
     /**
      * @var ClientInterface|null
      */
@@ -58,13 +61,21 @@ class RequestHandler implements RequestHandlerImp
     public function send(array $providers, string $ip)
     {
         foreach ($providers as $name => $provider) {
+            if ($info = $this->getCacheStore()->get($this->cacheKey($name, $ip))) {
+                return $info;
+            }
+
             for ($time = 1; $time <= $this->getTryTimes(); $time++) {
                 try {
                     /** @var IpImp $provider */
-                    return array_merge($provider->send($this->getClient(), $ip), [
+                    $result = array_merge($provider->send($this->getClient(), $ip), [
                         'provider' => $name,
                         'success'  => 1,
                     ]);
+
+                    $this->getCacheStore()->put($this->cacheKey($name, $ip), $result);
+
+                    return $result;
                 } catch (ServerErrorException $e) {
                     $this->logError($name, $e);
 

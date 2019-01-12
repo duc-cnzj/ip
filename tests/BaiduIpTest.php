@@ -33,8 +33,10 @@ class BaiduIpTest extends TestCase
     public function test_baidu_config()
     {
         $this->server->setConfig(['ak' => 'xxxxx']);
-
         $this->assertEquals('xxxxx', $this->server->getAk());
+
+        $this->server->setConfig('');
+        $this->assertEquals('', $this->server->getAk());
     }
 
     /** @test */
