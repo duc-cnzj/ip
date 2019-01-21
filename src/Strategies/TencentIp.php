@@ -6,6 +6,7 @@ use DucCnzj\Ip\Imp\IpImp;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 
 /**
@@ -72,7 +73,7 @@ class TencentIp implements IpImp
             $result = json_decode($originalStr, true);
 
             if ($result['status'] !== 0) {
-                throw new ServerErrorException($result['message']);
+                throw new BreakLoopException($result['message']);
             }
 
             $data['ip'] = $ip;

@@ -2,6 +2,7 @@
 
 namespace DucCnzj\Ip\Tests;
 
+use GuzzleHttp\Client;
 use DucCnzj\Ip\IpClient;
 use DucCnzj\Ip\Imp\IpImp;
 use Mockery\MockInterface;
@@ -14,6 +15,9 @@ use DucCnzj\Ip\Imp\CacheStoreImp;
 use DucCnzj\Ip\Strategies\BaiduIp;
 use DucCnzj\Ip\Strategies\TaobaoIp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Exception\ClientException;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 use DucCnzj\Ip\Exceptions\InvalidArgumentException;
@@ -25,6 +29,28 @@ class IpTest extends TestCase
      * @var IpClient
      */
     protected $client;
+
+    protected $taobaoReturn = '{"code":0,"data":{"ip":"117.149.174.132","country":"中国","area":"","region":"浙江","city":"绍兴","county":"XX","isp":"移动","country_id":"CN","area_id":"","region_id":"330000","city_id":"330600","county_id":"xx","isp_id":"100025"}}';
+
+    /**
+     * @var string
+     */
+    protected $baiduUrl = 'https://api.map.baidu.com/location/ip';
+
+    /**
+     * @var string
+     */
+    protected $aliUrl = 'http://iploc.market.alicloudapi.com/v3/ip';
+
+    /**
+     * @var string
+     */
+    protected $tencentUrl = 'https://apis.map.qq.com/ws/location/v1/ip';
+
+    /**
+     * @var string
+     */
+    protected $taobaoUrl = 'http://ip.taobao.com/service/getIpInfo.php';
 
     /**
      * @var array
@@ -74,6 +100,9 @@ class IpTest extends TestCase
         'provider' => 'baidu',
     ];
 
+    /**
+     * @var array
+     */
     protected $errors = [
         'success' => 0,
         'message' => '获取 ip 信息失败',
@@ -614,5 +643,64 @@ class IpTest extends TestCase
             'provider: baidu. 获取失败',
             'provider: taobao. 获取失败',
         ], $client->getErrors());
+    }
+
+    /** @test */
+    public function test_send_use_all_provider()
+    {
+        $ip = '127.0.0.1';
+        $guzzle = \Mockery::mock(Client::class);
+
+        $request = \Mockery::mock(RequestInterface::class);
+        $response = \Mockery::mock(ResponseInterface::class);
+        $response->shouldReceive('getStatusCode')->andReturn(401);
+
+        $response->shouldReceive('getBody')->once()->andReturn(json_encode([
+            'status'  => '400',
+            'message' => 'baidu AK参数不存在',
+        ]));
+
+        $response->shouldReceive('getBody')->once()->andReturn(json_encode([
+            'status'  => '400',
+            'message' => 'tencent 缺少必要字段key',
+        ]));
+
+        $response->shouldReceive('getBody')->once()->andReturn($this->taobaoReturn);
+
+        $requestHandler = \Mockery::mock(RequestHandler::class)->makePartial();
+
+        $guzzle->shouldReceive('request')
+            ->with('get', $this->baiduUrl . '?ip=' . $ip . '&ak=')
+            ->andReturn($response);
+
+        $guzzle->shouldReceive('request')->with(
+            'get',
+            $this->aliUrl . '?ip=' . $ip,
+            [
+                'headers' => [
+                    'Authorization' => 'APPCODE ',
+                ],
+            ]
+        )->andThrow(new ClientException('ali 401 fail', $request, $response));
+
+        $guzzle->shouldReceive('request')
+            ->with('get', $this->tencentUrl . '?ip=' . $ip . '&key=')
+            ->andReturn($response);
+
+        $guzzle->shouldReceive('request')
+            ->with('get', $this->taobaoUrl . '?ip=' . $ip)
+            ->andReturn($response);
+
+        $requestHandler->shouldReceive('getClient')->andReturn($guzzle);
+
+        $this->client->setRequestHandler($requestHandler);
+
+        $city = $this->client->setIp($ip)->use('baidu', 'ali', 'tencent', 'taobao')->getCity();
+        $this->assertEquals('绍兴', $city);
+        $this->assertEquals([
+            'provider: baidu. baidu AK参数不存在',
+            'provider: ali. ali 401 fail',
+            'provider: tencent. tencent 缺少必要字段key',
+        ], $this->client->getErrors());
     }
 }

@@ -2,6 +2,6 @@
 
 namespace DucCnzj\Ip\Exceptions;
 
-class UnauthorizedException extends Exception
+class UnauthorizedException extends BreakLoopException
 {
 }
