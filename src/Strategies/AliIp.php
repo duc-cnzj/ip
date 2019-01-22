@@ -9,7 +9,6 @@ use GuzzleHttp\Exception\ServerException;
 use DucCnzj\Ip\Exceptions\AnalysisException;
 use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
-use DucCnzj\Ip\Exceptions\UnauthorizedException;
 
 class AliIp implements IpImp
 {
