@@ -111,6 +111,10 @@ $client->bound('taobao', $taobao);
 
 # set custom CacheStore. default is ArrayStore. need implement DucCnzj\Ip\Imp\CacheStoreImp;
 $client->setCacheStore($store);
+
+# mutil set/get configs
+$client->setConfigs(['ali' => 'xxxxx', 'baidu' => 'xxxxx']);
+$client->getConfigs('ali', 'baidu');
 ```
 
 ## License
