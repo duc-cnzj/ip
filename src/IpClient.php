@@ -284,6 +284,10 @@ class IpClient
      */
     public function getConfigs(string ...$names)
     {
+        if (empty($names)) {
+            return $this->providerConfig;
+        }
+
         $result = [];
         foreach ($names as $provider) {
             $result[$provider] = $this->getProviderConfig($provider);

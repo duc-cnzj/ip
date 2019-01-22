@@ -149,6 +149,11 @@ class IpTest extends TestCase
             'baidu' => ['secret' => 'xxxxxxxx'],
             'ali'   => 'alixxxxx',
         ], $this->client->getConfigs('ali', 'baidu'));
+
+        $this->assertEquals([
+            'baidu' => ['secret' => 'xxxxxxxx'],
+            'ali'   => 'alixxxxx',
+        ], $this->client->getConfigs());
     }
 
     /** @test */
