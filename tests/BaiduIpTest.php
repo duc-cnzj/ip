@@ -8,6 +8,7 @@ use DucCnzj\Ip\Strategies\BaiduIp;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 
@@ -59,7 +60,7 @@ class BaiduIpTest extends TestCase
     {
         $ip = '127.0.0.1';
 
-        $this->expectException(ServerErrorException::class);
+        $this->expectException(BreakLoopException::class);
         $clientException = \Mockery::mock(ClientException::class);
         $serverException = \Mockery::mock(ServerException::class);
         $guzzleClient = \Mockery::mock(Client::class);

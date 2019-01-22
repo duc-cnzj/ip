@@ -276,6 +276,23 @@ class IpClient
     }
 
     /**
+     * @param string[] ...$names
+     *
+     * @return array
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function getConfigs(string ...$names)
+    {
+        $result = [];
+        foreach ($names as $provider) {
+            $result[$provider] = $this->getProviderConfig($provider);
+        }
+
+        return $result;
+    }
+
+    /**
      * @param string $ip
      *
      * @return $this
@@ -317,6 +334,22 @@ class IpClient
     public function setProviderConfig(string $provider, $config)
     {
         $this->providerConfig[$provider] = $config;
+
+        return $this;
+    }
+
+    /**
+     * @param array $configs
+     *
+     * @return $this
+     *
+     * @author duc <1025434218@qq.com>
+     */
+    public function setConfigs(array $configs)
+    {
+        foreach ($configs as $provider => $config) {
+            $this->setProviderConfig($provider, $config);
+        }
 
         return $this;
     }

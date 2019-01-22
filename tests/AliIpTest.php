@@ -9,8 +9,8 @@ use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use DucCnzj\Ip\Exceptions\AnalysisException;
+use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
-use DucCnzj\Ip\Exceptions\UnauthorizedException;
 
 class AliIpTest extends TestCase
 {
@@ -86,34 +86,11 @@ class AliIpTest extends TestCase
     }
 
     /** @test */
-    public function test_401_response()
-    {
-        $ip = '127.0.0.1';
-
-        $this->expectException(UnauthorizedException::class);
-        $guzzleClient = \Mockery::mock(Client::class);
-        $response = \Mockery::mock(ResponseInterface::class);
-
-        $e = \Mockery::mock(ClientException::class);
-        $e->shouldReceive('getResponse')->andReturn($response);
-
-        $response->shouldReceive('getStatusCode')->andReturn(401);
-
-        $guzzleClient->shouldReceive('request')->with('get', $this->url . '?ip=' . $ip, [
-            'headers' => [
-                'Authorization' => 'APPCODE ',
-            ],
-        ])->andThrow($e);
-
-        $this->server->send($guzzleClient, $ip);
-    }
-
-    /** @test */
     public function test_client_exception()
     {
         $ip = '127.0.0.1';
 
-        $this->expectException(ServerErrorException::class);
+        $this->expectException(BreakLoopException::class);
         $guzzleClient = \Mockery::mock(Client::class);
         $response = \Mockery::mock(ResponseInterface::class);
 

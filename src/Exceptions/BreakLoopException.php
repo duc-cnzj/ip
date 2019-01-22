@@ -2,6 +2,6 @@
 
 namespace DucCnzj\Ip\Exceptions;
 
-class BreakLoopException extends Exception
+class BreakLoopException extends Exception implements BreakLoopExceptionImp
 {
 }

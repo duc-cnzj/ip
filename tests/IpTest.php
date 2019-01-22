@@ -135,6 +135,23 @@ class IpTest extends TestCase
     }
 
     /** @test */
+    public function set_multi_provider_configs_test()
+    {
+        $this->assertEquals([], $this->client->getProviderConfig('baidu'));
+        $this->assertEquals([], $this->client->getProviderConfig('ali'));
+
+        $this->client->setConfigs(['baidu' => ['secret' => 'xxxxxxxx'], 'ali' => 'alixxxxx']);
+
+        $this->assertEquals(['secret' => 'xxxxxxxx'], $this->client->getProviderConfig('baidu'));
+        $this->assertEquals('alixxxxx', $this->client->getProviderConfig('ali'));
+
+        $this->assertEquals([
+            'baidu' => ['secret' => 'xxxxxxxx'],
+            'ali'   => 'alixxxxx',
+        ], $this->client->getConfigs('ali', 'baidu'));
+    }
+
+    /** @test */
     public function set_mapper_test()
     {
         $client = \Mockery::mock(IpClient::class)->makePartial();

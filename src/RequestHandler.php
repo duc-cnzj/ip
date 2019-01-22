@@ -7,8 +7,8 @@ use DucCnzj\Ip\Imp\IpImp;
 use GuzzleHttp\ClientInterface;
 use DucCnzj\Ip\Traits\CacheResponse;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
-use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
+use DucCnzj\Ip\Exceptions\BreakLoopExceptionImp;
 
 class RequestHandler implements RequestHandlerImp
 {
@@ -80,7 +80,7 @@ class RequestHandler implements RequestHandlerImp
                     $this->logError($name, $e);
 
                     continue;
-                } catch (BreakLoopException $e) {
+                } catch (BreakLoopExceptionImp $e) {
                     $this->logError($name, $e);
 
                     continue 2;

@@ -122,7 +122,7 @@ class TencentIpTest extends TestCase
     {
         $ip = '127.0.0.1';
 
-        $this->expectException(ServerErrorException::class);
+        $this->expectException(BreakLoopException::class);
         $guzzleClient = \Mockery::mock(Client::class);
         $response = \Mockery::mock(ResponseInterface::class);
 

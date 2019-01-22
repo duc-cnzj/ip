@@ -60,6 +60,7 @@ class TencentIp implements IpImp
      * @param string          $ip
      *
      * @return array
+     * @throws BreakLoopException
      * @throws ServerErrorException
      *
      * @author duc <1025434218@qq.com>
@@ -84,7 +85,7 @@ class TencentIp implements IpImp
         } catch (ServerException $e) {
             throw new ServerErrorException();
         } catch (ClientException $e) {
-            throw new ServerErrorException();
+            throw new BreakLoopException();
         }
     }
 

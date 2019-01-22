@@ -6,6 +6,7 @@ use DucCnzj\Ip\Imp\IpImp;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 
@@ -62,6 +63,7 @@ class BaiduIp implements IpImp
      * @param string          $ip
      *
      * @return array
+     * @throws BreakLoopException
      * @throws InvalidArgumentException
      * @throws ServerErrorException
      *
@@ -86,7 +88,7 @@ class BaiduIp implements IpImp
         } catch (ServerException $e) {
             throw new ServerErrorException($e->getMessage());
         } catch (ClientException $e) {
-            throw new ServerErrorException($e->getMessage());
+            throw new BreakLoopException($e->getMessage());
         }
     }
 

@@ -7,6 +7,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use DucCnzj\Ip\Exceptions\AnalysisException;
+use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 use DucCnzj\Ip\Exceptions\UnauthorizedException;
 
@@ -66,8 +67,8 @@ class AliIp implements IpImp
      *
      * @return array
      * @throws AnalysisException
+     * @throws BreakLoopException
      * @throws ServerErrorException
-     * @throws UnauthorizedException
      *
      * @author duc <1025434218@qq.com>
      */
@@ -97,11 +98,7 @@ class AliIp implements IpImp
         } catch (ServerException $e) {
             throw new ServerErrorException($e->getMessage());
         } catch (ClientException $e) {
-            if ($e->getResponse()->getStatusCode() === 401) {
-                throw new UnauthorizedException($e->getMessage());
-            }
-
-            throw new ServerErrorException($e->getMessage());
+            throw new BreakLoopException($e->getMessage());
         }
     }
 
