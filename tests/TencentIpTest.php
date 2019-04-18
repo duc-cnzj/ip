@@ -11,6 +11,10 @@ use GuzzleHttp\Exception\ServerException;
 use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 
+/**
+ * Class TencentIpTest
+ * @package DucCnzj\Ip\Tests
+ */
 class TencentIpTest extends TestCase
 {
     /**

@@ -50,6 +50,13 @@ trait CacheResponse
         return $this;
     }
 
+    /**
+     * @param string $name
+     * @param string $ip
+     * @return string
+     *
+     * @author duc <1025434218@qq.com>
+     */
     public function cacheKey(string $name, string $ip)
     {
         return $name . ':' . $ip;

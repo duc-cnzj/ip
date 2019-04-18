@@ -62,12 +62,13 @@ class AliIp implements IpImp
 
     /**
      * @param ClientInterface $client
-     * @param string          $ip
+     * @param string $ip
      *
      * @return array
      * @throws AnalysisException
      * @throws BreakLoopException
      * @throws ServerErrorException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      *
      * @author duc <1025434218@qq.com>
      */

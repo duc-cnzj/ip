@@ -60,12 +60,13 @@ class BaiduIp implements IpImp
 
     /**
      * @param ClientInterface $client
-     * @param string          $ip
+     * @param string $ip
      *
      * @return array
      * @throws BreakLoopException
      * @throws InvalidArgumentException
      * @throws ServerErrorException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      *
      * @author duc <1025434218@qq.com>
      */

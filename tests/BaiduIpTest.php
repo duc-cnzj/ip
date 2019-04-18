@@ -12,6 +12,10 @@ use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 use DucCnzj\Ip\Exceptions\InvalidArgumentException;
 
+/**
+ * Class BaiduIpTest
+ * @package DucCnzj\Ip\Tests
+ */
 class BaiduIpTest extends TestCase
 {
     /**
@@ -19,10 +23,20 @@ class BaiduIpTest extends TestCase
      */
     protected $server;
 
+    /**
+     * @var string
+     */
     protected $return = '{"address":"CN|\u6d59\u6c5f|\u7ecd\u5174|None|CMNET|0|0","content":{"address_detail":{"province":"\u6d59\u6c5f\u7701","city":"\u7ecd\u5174\u5e02","district":"","street":"","street_number":"","city_code":293},"address":"\u6d59\u6c5f\u7701\u7ecd\u5174\u5e02","point":{"y":"3482292.23","x":"13424438.13"}},"status":0}';
 
+    /**
+     * @var string
+     */
     protected $url = 'https://api.map.baidu.com/location/ip';
 
+    /**
+     *
+     * @author duc <1025434218@qq.com>
+     */
     protected function setUp(
     )/* The :void return type declaration that should be here would cause a BC issue */
     {

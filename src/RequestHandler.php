@@ -9,7 +9,12 @@ use DucCnzj\Ip\Traits\CacheResponse;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 use DucCnzj\Ip\Exceptions\BreakLoopExceptionImp;
+use DucCnzj\Ip\Exceptions\CantResolveClassException;
 
+/**
+ * Class RequestHandler
+ * @package DucCnzj\Ip
+ */
 class RequestHandler implements RequestHandlerImp
 {
     use CacheResponse;
@@ -18,6 +23,11 @@ class RequestHandler implements RequestHandlerImp
      * @var ClientInterface|null
      */
     protected $client;
+
+    /**
+     * @var array
+     */
+    protected $errorStacks = [];
 
     /**
      * @var array
@@ -50,24 +60,34 @@ class RequestHandler implements RequestHandlerImp
     }
 
     /**
-     * @param array  $providers
+     * @param array $providers
      * @param string $ip
      *
      * @return array
      * @throws ServerErrorException
-     *
      * @author duc <1025434218@qq.com>
      */
     public function send(array $providers, string $ip)
     {
-        foreach ($providers as $name => $provider) {
+        if (empty($providers)) {
+            return ['success'  => 0];
+        }
+
+        foreach ($providers as $name => $providerClosure) {
             if ($info = $this->getCacheStore()->get($this->cacheKey($name, $ip))) {
                 return $info;
             }
 
+            /** @var IpImp $provider */
+            try {
+                $provider = $providerClosure();
+            } catch (CantResolveClassException $e) {
+                $this->errorStacks[] = $e->getMessage();
+                continue;
+            }
+
             for ($time = 1; $time <= $this->getTryTimes(); $time++) {
                 try {
-                    /** @var IpImp $provider */
                     $result = array_merge($provider->send($this->getClient(), $ip), [
                         'provider' => $name,
                         'success'  => 1,
@@ -90,6 +110,10 @@ class RequestHandler implements RequestHandlerImp
                     break 2;
                 }
             }
+        }
+
+        if (! empty($this->errorStacks)) {
+            throw new \RuntimeException(json_encode($this->errorStacks));
         }
 
         throw new ServerErrorException();

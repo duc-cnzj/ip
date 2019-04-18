@@ -17,7 +17,7 @@ A SDK for ip.
 ## Installing
 
 ```shell
-$ composer require duc_cnzj/ip -vvv
+composer require duc_cnzj/ip
 ```
 
 ## Usage
@@ -51,7 +51,10 @@ $client->useProvider('tencent')
 # or 
 $client->useProvider('tencent')
     ->setProviderConfig('tencent', 'xxxxxxxxxxxx');
-    
+
+# mutil set/get configs
+$client->setConfigs(['ali' => 'xxxxx', 'baidu' => 'xxxxx']);
+$client->getConfigs('ali', 'baidu');
 
 # if use ali api, you need provide ak secret.
 $client->useProvider('ali')
@@ -106,15 +109,12 @@ other methods
 ```php
 $client->clearUse(); # will clear providers;
 
-# custom your instance. need implement DucCnzj\Ip\Imp\IpImp;
-$client->bound('taobao', $taobao);
+# custom your instance. need implement DucCnzj\Ip\Imp\IpImp, Object or String.
+# if it dont need secret, pls set the third parameter false;
+$client->bind('taobao', $taobao);
 
 # set custom CacheStore. default is ArrayStore. need implement DucCnzj\Ip\Imp\CacheStoreImp;
 $client->setCacheStore($store);
-
-# mutil set/get configs
-$client->setConfigs(['ali' => 'xxxxx', 'baidu' => 'xxxxx']);
-$client->getConfigs('ali', 'baidu');
 ```
 
 ## License

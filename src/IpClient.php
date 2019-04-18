@@ -2,10 +2,10 @@
 
 namespace DucCnzj\Ip;
 
-use DucCnzj\Ip\Imp\IpImp;
 use DucCnzj\Ip\Imp\DataMapImp;
 use DucCnzj\Ip\Imp\CacheStoreImp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
+use DucCnzj\Ip\Traits\HandleProvider;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 use DucCnzj\Ip\Exceptions\IpProviderClassNotExistException;
@@ -22,25 +22,12 @@ use DucCnzj\Ip\Exceptions\IpProviderClassNotExistException;
  */
 class IpClient
 {
+    use HandleProvider;
+
     /**
      * @var string
      */
     protected $ip;
-
-    /**
-     * @var array
-     */
-    protected $providerConfig = [];
-
-    /**
-     * @var array|null ['baidu', 'taobao']
-     */
-    protected $providers = [];
-
-    /**
-     * @var array
-     */
-    protected $instances = [];
 
     /**
      * @var DataMapImp
@@ -83,56 +70,13 @@ class IpClient
     }
 
     /**
-     * @return array
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function resolveProviders()
-    {
-        $providerInstance = [];
-
-        foreach ($this->getProviders() as $provider) {
-            if (! isset($this->instances[$provider])) {
-                $this->instances[$provider] = $this->createProvider($provider);
-            }
-
-            $providerInstance[$provider] = $this->instances[$provider];
-        }
-
-        return $providerInstance;
-    }
-
-    /**
-     * @param string $provider
-     *
-     * @return IpImp
-     * @throws IpProviderClassNotExistException
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function createProvider(string $provider)
-    {
-        $config = $this->getProviderConfig($provider);
-
-        $shortName = ucfirst(strtolower($provider)) . 'Ip';
-
-        $class = __NAMESPACE__ . "\Strategies\\{$shortName}";
-
-        if (! class_exists($class)) {
-            throw new IpProviderClassNotExistException("{$class} 不存在");
-        }
-
-        return new $class($config);
-    }
-
-    /**
      * @param string $msg
      *
      * @return array
      *
      * @author duc <1025434218@qq.com>
      */
-    public function responseWithError(string $msg)
+    protected function responseWithError(string $msg)
     {
         return [
             'success' => 0,
@@ -143,6 +87,8 @@ class IpClient
     /**
      * @return DataMapper|DataMapImp|NullDataMapper
      *
+     * @throws IpProviderClassNotExistException
+     * @throws \Exception
      * @author duc <1025434218@qq.com>
      */
     public function getDataMapper()
@@ -179,6 +125,8 @@ class IpClient
     /**
      * @return array|mixed
      *
+     * @throws IpProviderClassNotExistException
+     * @throws \Exception
      * @author duc <1025434218@qq.com>
      */
     public function getOriginalInfo()
@@ -188,6 +136,8 @@ class IpClient
                 ->send($this->resolveProviders(), $this->getIp());
         } catch (ServerErrorException $e) {
             return $this->responseWithError($e->getMessage());
+        } catch (\RuntimeException $exception) {
+            throw $exception;
         }
 
         return $result;
@@ -201,24 +151,6 @@ class IpClient
     public function getErrors(): array
     {
         return $this->getRequestHandler()->getErrors();
-    }
-
-    /**
-     * @return array
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function getProviders()
-    {
-        if (is_null($this->providers)) {
-            return [];
-        }
-
-        if (count($this->providers) === 0) {
-            return $this->providers = $this->getDefaultProviders();
-        }
-
-        return $this->providers;
     }
 
     /**
@@ -237,35 +169,6 @@ class IpClient
     }
 
     /**
-     * @return array
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function getDefaultProviders()
-    {
-        return [
-            'baidu',
-            'ali',
-            'tencent',
-            'taobao',
-        ];
-    }
-
-    /**
-     * @param string $provider
-     *
-     * @return array|string
-     */
-    public function getProviderConfig(string $provider)
-    {
-        if (! isset($this->providerConfig[$provider])) {
-            return [];
-        }
-
-        return $this->providerConfig[$provider];
-    }
-
-    /**
      * @return CacheStore|CacheStoreImp
      *
      * @author duc <1025434218@qq.com>
@@ -276,31 +179,11 @@ class IpClient
     }
 
     /**
-     * @param string[] ...$names
-     *
-     * @return array
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function getConfigs(string ...$names)
-    {
-        if (empty($names)) {
-            return $this->providerConfig;
-        }
-
-        $result = [];
-        foreach ($names as $provider) {
-            $result[$provider] = $this->getProviderConfig($provider);
-        }
-
-        return $result;
-    }
-
-    /**
      * @param string $ip
      *
      * @return $this
      *
+     * @throws InvalidIpAddress
      * @author duc <1025434218@qq.com>
      */
     public function setIp(string $ip)
@@ -308,52 +191,6 @@ class IpClient
         $this->checkIp($ip);
 
         $this->ip = $ip;
-
-        return $this;
-    }
-
-    /**
-     * @param string[] ...$provider
-     *
-     * @return $this
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function useProvider(string ...$provider)
-    {
-        $providers = array_merge($this->providers ?? [], array_filter($provider));
-        $this->providers = array_unique($providers);
-
-        return $this;
-    }
-
-    /**
-     * @param string $provider
-     * @param array|string $config
-     *
-     * @return $this
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function setProviderConfig(string $provider, $config)
-    {
-        $this->providerConfig[$provider] = $config;
-
-        return $this;
-    }
-
-    /**
-     * @param array $configs
-     *
-     * @return $this
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function setConfigs(array $configs)
-    {
-        foreach ($configs as $provider => $config) {
-            $this->setProviderConfig($provider, $config);
-        }
 
         return $this;
     }
@@ -401,61 +238,10 @@ class IpClient
     }
 
     /**
-     * @param string $provider
-     * @param IpImp  $instance
-     *
-     * @return $this
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function bound(string $provider, IpImp $instance)
-    {
-        $this->instances[$provider] = $instance;
-
-        return $this;
-    }
-
-    /**
-     * @param string[] ...$provider
-     *
-     * @return IpClient
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function use(string ...$provider)
-    {
-        return $this->useProvider(...$provider);
-    }
-
-    /**
-     * @return $this
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function clearUse()
-    {
-        $this->providers = null;
-
-        return $this;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return mixed|null
-     *
-     * @author duc <1025434218@qq.com>
-     */
-    public function getInstanceByName(string $name)
-    {
-        return isset($this->instances[$name]) ? $this->instances[$name] : null;
-    }
-
-    /**
      * @param string $name
      * @param $arguments
-     *
-     * @return array
+     * @return mixed
+     * @throws \Exception
      *
      * @author duc <1025434218@qq.com>
      */
@@ -466,8 +252,8 @@ class IpClient
 
     /**
      * @param string $name
-     *
-     * @return mixed|string
+     * @return mixed|string|null
+     * @throws \Exception
      *
      * @author duc <1025434218@qq.com>
      */

@@ -15,10 +15,11 @@ class TaobaoIp implements IpImp
     /**
      * @param ClientInterface $httpClient
      *
-     * @param string          $ip
+     * @param string $ip
      *
      * @return array
      * @throws ServerErrorException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @author duc <1025434218@qq.com>
      */
     public function send(ClientInterface $httpClient, string $ip):array

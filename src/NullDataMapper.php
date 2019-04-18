@@ -83,9 +83,9 @@ class NullDataMapper implements DataMapImp
     }
 
     /**
-     * @param $name
+     * @param string $name
      *
-     * @return mixed|string
+     * @return mixed|null
      *
      * @author duc <1025434218@qq.com>
      */

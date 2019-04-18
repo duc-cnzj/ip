@@ -7,6 +7,10 @@ use DucCnzj\Ip\CacheStore;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Imp\CacheStoreImp;
 
+/**
+ * Class CacheStoreTest
+ * @package DucCnzj\Ip\Tests
+ */
 class CacheStoreTest extends TestCase
 {
     /**

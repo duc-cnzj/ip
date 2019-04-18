@@ -13,8 +13,15 @@ use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Exception\ConnectException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 
+/**
+ * Class RequestHandlerTest
+ * @package DucCnzj\Ip\Tests
+ */
 class RequestHandlerTest extends TestCase
 {
+    /**
+     * @var string
+     */
     protected $ip = '127.0.0.1';
 
     /**
@@ -38,6 +45,10 @@ class RequestHandlerTest extends TestCase
      */
     protected $handler;
 
+    /**
+     *
+     * @author duc <1025434218@qq.com>
+     */
     protected function setUp()
     {
         parent::setUp();
@@ -73,9 +84,9 @@ class RequestHandlerTest extends TestCase
         $taobao = \Mockery::mock(TaobaoIp::class);
         $connectExecption = new ConnectException('网络连接失败', $request);
         $taobao->shouldReceive('send')->andThrow($connectExecption);
-        $providers = ['taobao' => $taobao];
-
-        $this->handler->send($providers, $this->ip);
+        $this->handler->send(['taobao' => function () use ($taobao) {
+            return $taobao;
+        }], $this->ip);
         $this->assertEquals(['网络连接失败'], $this->handler->getErrors());
     }
 
@@ -93,7 +104,11 @@ class RequestHandlerTest extends TestCase
         $cacheStore = $this->handler->getCacheStore();
         $this->assertEquals([], $cacheStore->getAllItems());
 
-        $this->handler->send($providers, $ip);
+        $this->handler->send([
+            'taobao' => function () use ($taobao) {
+                return $taobao;
+            },
+        ], $ip);
 
         $this->assertCount(1, $cacheStore);
 
@@ -116,19 +131,23 @@ class RequestHandlerTest extends TestCase
         $taobao->shouldReceive('send')->once()->andReturn($this->taobaoData);
         $taobao->shouldReceive('send')->once()->andThrow(new \Exception());
 
-        $providers = [
-            'taobao' => $taobao,
-        ];
-
         $this->handler->setCacheStore($cacheStore);
         $this->assertSame($cacheStore, $this->handler->getCacheStore());
 
         $cacheStore = $this->handler->getCacheStore();
         $this->assertEquals([], $cacheStore->getAllItems());
 
-        $this->handler->send($providers, $ip);
+        $this->handler->send([
+            'taobao' => function () use ($taobao) {
+                return $taobao;
+            },
+        ], $ip);
         $this->assertCount(0, $cacheStore);
 
-        $this->handler->send($providers, $ip);
+        $this->handler->send([
+            'taobao' => function () use ($taobao) {
+                return $taobao;
+            },
+        ], $ip);
     }
 }
