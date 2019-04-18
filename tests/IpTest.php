@@ -724,7 +724,7 @@ class IpTest extends TestCase
 
     public function test_get_magic_method()
     {
-        $client =\Mockery::mock(IpClient::class)->makePartial();
+        $client = \Mockery::mock(IpClient::class)->makePartial();
         $client->shouldReceive('getOriginalInfo')->andReturn($this->data);
         $this->assertEquals('阿鲁巴', $client->country);
     }
