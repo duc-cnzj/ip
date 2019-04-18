@@ -15,14 +15,15 @@ use DucCnzj\Ip\Imp\CacheStoreImp;
 use DucCnzj\Ip\Strategies\BaiduIp;
 use DucCnzj\Ip\Strategies\TaobaoIp;
 use DucCnzj\Ip\Imp\RequestHandlerImp;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Exception\ClientException;
 use DucCnzj\Ip\Exceptions\InvalidIpAddress;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 use DucCnzj\Ip\Exceptions\InvalidArgumentException;
-use DucCnzj\Ip\Exceptions\IpProviderClassNotExistException;
 
+/**
+ * Class IpTest
+ * @package DucCnzj\Ip\Tests
+ */
 class IpTest extends TestCase
 {
     /**
@@ -30,6 +31,9 @@ class IpTest extends TestCase
      */
     protected $client;
 
+    /**
+     * @var string
+     */
     protected $taobaoReturn = '{"code":0,"data":{"ip":"117.149.174.132","country":"中国","area":"","region":"浙江","city":"绍兴","county":"XX","isp":"移动","country_id":"CN","area_id":"","region_id":"330000","city_id":"330600","county_id":"xx","isp_id":"100025"}}';
 
     /**
@@ -108,6 +112,10 @@ class IpTest extends TestCase
         'message' => '获取 ip 信息失败',
     ];
 
+    /**
+     *
+     * @author duc <1025434218@qq.com>
+     */
     protected function setUp(
     )/* The :void return type declaration that should be here would cause a BC issue */
     {
@@ -169,6 +177,7 @@ class IpTest extends TestCase
         $client->setIp('127.0.0.1');
         $client->setDataMapper(new NullDataMapper());
         $this->assertInstanceOf(NullDataMapper::class, $client->getDataMapper());
+        $client->shouldHaveReceived('getOriginalInfo')->times(1);
     }
 
     /** @test */
@@ -229,24 +238,26 @@ class IpTest extends TestCase
     {
         $ip = '127.0.0.1';
 
-        $client = \Mockery::mock(IpClient::class)->makePartial();
-        $httpClient = \Mockery::mock(ClientInterface::class);
-
-        /** @var TaobaoIp $taobao */
-        $taobao = \Mockery::mock(TaobaoIp::class);
-
-        /** @var RequestHandler $handler */
-        $handler = \Mockery::mock(RequestHandler::class)->makePartial();
-
         $exception = new InvalidArgumentException();
         $exception1 = new ServerErrorException();
+
+        $client = \Mockery::mock(IpClient::class)->shouldAllowMockingProtectedMethods()->makePartial();
+        /** @var TaobaoIp|MockInterface $taobao */
+        $taobao = \Mockery::mock(TaobaoIp::class);
+        /** @var RequestHandler $handler */
+        $handler = \Mockery::mock(RequestHandler::class)->makePartial();
+        $httpClient = \Mockery::mock(ClientInterface::class);
 
         $taobao->expects()->send($httpClient, $ip)->times(1)->andThrow($exception1);
         $taobao->expects()->send($httpClient, $ip)->times(1)->andThrow($exception);
 
+        $client->shouldReceive('getClosure')->with('taobao', TaobaoIp::class)->andReturn(function () use ($taobao) {
+            return $taobao;
+        });
+
         $handler->shouldReceive('getClient')->andReturn($httpClient);
 
-        $client->setIp($ip)->bound('taobao', $taobao)->useProvider('taobao');
+        $client->setIp($ip)->bind('taobao', TaobaoIp::class)->useProvider('taobao');
 
         $client->shouldReceive('getRequestHandler')->andReturn($handler);
         $client->shouldReceive('getCity')->andReturn($client->getDataMapper()->getCity());
@@ -257,6 +268,8 @@ class IpTest extends TestCase
             'provider: taobao. 获取 ip 信息失败',
             'provider: taobao. 参数验证失败',
         ], $client->getErrors());
+
+        $taobao->shouldHaveReceived('send')->times(2);
     }
 
     /** @test */
@@ -276,7 +289,7 @@ class IpTest extends TestCase
 
         $client->setIp($ip)
             ->use('taobao')
-            ->bound('taobao', $taobao);
+            ->bind('taobao', $taobao);
 
         $this->assertEquals($ip, $client->getIp());
 
@@ -296,20 +309,15 @@ class IpTest extends TestCase
 
         /** @var RequestHandlerImp $handler */
         $handler = \Mockery::mock(RequestHandler::class)->makePartial();
-
         $taobao = \Mockery::mock(TaobaoIp::class)->makePartial();
-
         $taobao->shouldReceive('send')->andReturn($this->data);
-
         $baidu = \Mockery::mock(BaiduIp::class)->makePartial();
-
         $baidu->shouldReceive('send')->andReturn($this->data1);
-
         $client->shouldReceive('getRequestHandler')->andReturn($handler);
 
         $client->setIp($ip)
-            ->bound('taobao', $taobao)
-            ->bound('baidu', $baidu);
+            ->bind('taobao', $taobao)
+            ->bind('baidu', $baidu);
 
         $client->use('taobao');
 
@@ -324,9 +332,9 @@ class IpTest extends TestCase
 
         $client->clearUse()->use('baidu');
         $client->getOriginalInfo();
-        $this->assertEquals($this->data1, $client->getCacheStore()->get($handler->cacheKey('baidu', $ip)));
+        $this->assertEquals(null, $client->getCacheStore()->get($handler->cacheKey('baidu', $ip)));
 
-        $this->assertCount(2, $client->getCacheStore());
+        $this->assertCount(1, $client->getCacheStore());
     }
 
     /** @test */
@@ -428,7 +436,7 @@ class IpTest extends TestCase
 
         $client->shouldReceive('getRequestHandler')->andReturn($handler);
 
-        $client->setIp($ip)->useProvider('taobao')->bound('taobao', $taobao);
+        $client->setIp($ip)->useProvider('taobao')->bind('taobao', $taobao);
 
         $this->assertEquals(
             [
@@ -462,7 +470,7 @@ class IpTest extends TestCase
         $handler->shouldReceive('getClient')->andReturn($httpClient);
 
         $client->shouldReceive('getRequestHandler')->andReturn($handler);
-        $client->useProvider('taobao')->bound('taobao', $taobao);
+        $client->useProvider('taobao')->bind('taobao', $taobao);
 
         $client->setIp($ip)->try(3);
         $this->assertEquals(
@@ -498,18 +506,18 @@ class IpTest extends TestCase
     }
 
     /** @test */
-    public function bound_test()
+    public function bind_test()
     {
         $client = new IpClient();
         $taobao = \Mockery::mock(TaobaoIp::class);
 
-        $client->bound('taobao', $taobao);
+        $client->bind('taobao', $taobao);
 
         $instances = $client->resolveProviders();
 
-        $this->assertEquals(4, count($instances));
+        $this->assertEquals(1, count($instances));
 
-        $this->assertSame($taobao, $instances['taobao']);
+        $this->assertSame($taobao, $instances['taobao']());
     }
 
     /** @test */
@@ -550,13 +558,14 @@ class IpTest extends TestCase
 
         $instances = $client->resolveProviders();
 
+        $this->assertEquals(1, count($instances));
         foreach ($instances as $instance) {
-            $this->assertInstanceOf(IpImp::class, $instance);
+            $this->assertInstanceOf(IpImp::class, $instance());
         }
     }
 
     /** @test */
-    public function test_bound_providers()
+    public function test_bind_providers()
     {
         $client = new IpClient();
 
@@ -564,17 +573,16 @@ class IpTest extends TestCase
         $client->useProvider('taobao');
         $this->assertEquals(1, count($client->getProviders()));
 
-        $client->bound('taobao', $taobao);
-        $this->assertSame($client->getInstanceByName('taobao'), $taobao);
+        $client->bind('taobao', $taobao);
+        $this->assertSame($client->getInstanceByName('taobao')(), $taobao);
     }
 
     /** @test */
     public function test_class_not_resolve_exception()
     {
-        $this->expectException(IpProviderClassNotExistException::class);
         $client = new IpClient();
         $client->useProvider('duc');
-        $client->resolveProviders();
+        $this->assertEquals([], $client->resolveProviders());
     }
 
     /** @test */
@@ -622,7 +630,7 @@ class IpTest extends TestCase
         $handler->shouldReceive('getClient')->andReturn($httpClient);
 
         $client->shouldReceive('getRequestHandler')->andReturn($handler);
-        $client->useProvider('taobao')->bound('taobao', $taobao);
+        $client->useProvider('taobao')->bind('taobao', $taobao);
 
         $client->setIp($ip)->try(20);
         $this->assertEquals(
@@ -632,6 +640,40 @@ class IpTest extends TestCase
 
         $client->setIp($ip1);
         $this->assertEquals($this->taobaoData, $client->getOriginalInfo());
+    }
+
+    /** @test */
+    public function test_send_use_all_provider()
+    {
+        $ip = '127.0.0.1';
+        $guzzle = \Mockery::mock(Client::class);
+
+        $response = \Mockery::mock(ResponseInterface::class);
+        $response->shouldReceive('getStatusCode')->andReturn(401);
+
+        $response->shouldReceive('getBody')->once()->andReturn($this->taobaoReturn);
+
+        $requestHandler = \Mockery::mock(RequestHandler::class)->makePartial();
+
+        $guzzle->shouldReceive('request')
+            ->with('get', $this->baiduUrl . '?ip=' . $ip . '&ak=')
+            ->andReturn($response);
+
+        $guzzle->shouldReceive('request')
+            ->with('get', $this->tencentUrl . '?ip=' . $ip . '&key=')
+            ->andReturn($response);
+
+        $guzzle->shouldReceive('request')
+            ->with('get', $this->taobaoUrl . '?ip=' . $ip)
+            ->andReturn($response);
+
+        $requestHandler->shouldReceive('getClient')->andReturn($guzzle);
+
+        $this->client->setRequestHandler($requestHandler);
+
+        $city = $this->client->setIp($ip)->use('baidu', 'ali', 'tencent', 'taobao')->getCity();
+        $this->assertEquals('绍兴', $city);
+        $this->assertEquals([], $this->client->getErrors());
     }
 
     /** @test */
@@ -650,79 +692,40 @@ class IpTest extends TestCase
         $baidu->shouldReceive('send')->andThrow($exception);
 
         $client->use('ali', 'baidu', 'taobao');
-        $client->setProviderConfig('ali', 'appcode');
         $client->setProviderConfig('baidu', 'ak');
-        $client->bound('baidu', $baidu)
-            ->bound('ali', $ali)
-            ->bound('taobao', $taobao)
+        $client->bind('baidu', $baidu)
+            ->bind('ali', $ali)
+            ->bind('taobao', $taobao)
             ->try(1);
 
-        $client->setIp($ip);
+        $this->assertFalse($client->shouldNotSkip('ali'));
+        $this->assertTrue($client->shouldNotSkip('baidu'));
+        $this->assertTrue($client->shouldNotSkip('taobao'));
 
+        $client->setIp($ip);
         $client->getOriginalInfo();
+
         $this->assertEquals([
-            'provider: ali. 获取失败',
             'provider: baidu. 获取失败',
             'provider: taobao. 获取失败',
         ], $client->getErrors());
     }
 
     /** @test */
-    public function test_send_use_all_provider()
+    public function providers_those_not_configured_will_skip()
     {
-        $ip = '127.0.0.1';
-        $guzzle = \Mockery::mock(Client::class);
+        $client = new IpClient();
 
-        $request = \Mockery::mock(RequestInterface::class);
-        $response = \Mockery::mock(ResponseInterface::class);
-        $response->shouldReceive('getStatusCode')->andReturn(401);
+        $client->use('taobao', 'ali', 'tencent');
+        $this->assertFalse($client->shouldNotSkip('ali'));
+        $this->assertFalse($client->shouldNotSkip('tencent'));
+        $this->assertTrue($client->shouldNotSkip('taobao'));
+    }
 
-        $response->shouldReceive('getBody')->once()->andReturn(json_encode([
-            'status'  => '400',
-            'message' => 'baidu AK参数不存在',
-        ]));
-
-        $response->shouldReceive('getBody')->once()->andReturn(json_encode([
-            'status'  => '400',
-            'message' => 'tencent 缺少必要字段key',
-        ]));
-
-        $response->shouldReceive('getBody')->once()->andReturn($this->taobaoReturn);
-
-        $requestHandler = \Mockery::mock(RequestHandler::class)->makePartial();
-
-        $guzzle->shouldReceive('request')
-            ->with('get', $this->baiduUrl . '?ip=' . $ip . '&ak=')
-            ->andReturn($response);
-
-        $guzzle->shouldReceive('request')->with(
-            'get',
-            $this->aliUrl . '?ip=' . $ip,
-            [
-                'headers' => [
-                    'Authorization' => 'APPCODE ',
-                ],
-            ]
-        )->andThrow(new ClientException('ali 401 fail', $request, $response));
-
-        $guzzle->shouldReceive('request')
-            ->with('get', $this->tencentUrl . '?ip=' . $ip . '&key=')
-            ->andReturn($response);
-
-        $guzzle->shouldReceive('request')
-            ->with('get', $this->taobaoUrl . '?ip=' . $ip)
-            ->andReturn($response);
-
-        $requestHandler->shouldReceive('getClient')->andReturn($guzzle);
-
-        $this->client->setRequestHandler($requestHandler);
-
-        $city = $this->client->setIp($ip)->use('baidu', 'ali', 'tencent', 'taobao')->getCity();
-        $this->assertEquals('绍兴', $city);
-        $this->assertEquals([
-            'provider: baidu. baidu AK参数不存在',
-            'provider: ali. ali 401 fail',
-            'provider: tencent. tencent 缺少必要字段key',
-        ], $this->client->getErrors());
+    public function test_get_magic_method()
+    {
+        $client =\Mockery::mock(IpClient::class)->makePartial();
+        $client->shouldReceive('getOriginalInfo')->andReturn($this->data);
+        $this->assertEquals('阿鲁巴', $client->country);
     }
 }

@@ -6,6 +6,10 @@ use DucCnzj\Ip\NullDataMapper;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Exceptions\MethodNotExistException;
 
+/**
+ * Class NullDataMapperTest
+ * @package DucCnzj\Ip\Tests
+ */
 class NullDataMapperTest extends TestCase
 {
     /**
@@ -13,8 +17,15 @@ class NullDataMapperTest extends TestCase
      */
     protected $mapper;
 
+    /**
+     * @var string
+     */
     protected $ip = '127.0.0.1';
 
+    /**
+     *
+     * @author duc <1025434218@qq.com>
+     */
     protected function setUp()
     {
         parent::setUp();

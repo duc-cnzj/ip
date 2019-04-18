@@ -10,6 +10,10 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 
+/**
+ * Class TaobaoIpTest
+ * @package DucCnzj\Ip\Tests
+ */
 class TaobaoIpTest extends TestCase
 {
     /**
@@ -17,10 +21,20 @@ class TaobaoIpTest extends TestCase
      */
     protected $server;
 
+    /**
+     * @var string
+     */
     protected $return = '{"code":0,"data":{"ip":"117.149.174.132","country":"中国","area":"","region":"浙江","city":"绍兴","county":"XX","isp":"移动","country_id":"CN","area_id":"","region_id":"330000","city_id":"330600","county_id":"xx","isp_id":"100025"}}';
 
+    /**
+     * @var string
+     */
     protected $url = 'http://ip.taobao.com/service/getIpInfo.php';
 
+    /**
+     *
+     * @author duc <1025434218@qq.com>
+     */
     protected function setUp(
     )/* The :void return type declaration that should be here would cause a BC issue */
     {

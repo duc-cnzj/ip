@@ -2,6 +2,6 @@
 
 namespace DucCnzj\Ip\Exceptions;
 
-class IpProviderClassNotExistException extends Exception
+class IpProviderClassNotExistException extends \RuntimeException implements CantResolveClassException
 {
 }

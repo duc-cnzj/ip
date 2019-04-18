@@ -57,11 +57,12 @@ class TencentIp implements IpImp
 
     /**
      * @param ClientInterface $httpClient
-     * @param string          $ip
+     * @param string $ip
      *
      * @return array
      * @throws BreakLoopException
      * @throws ServerErrorException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      *
      * @author duc <1025434218@qq.com>
      */

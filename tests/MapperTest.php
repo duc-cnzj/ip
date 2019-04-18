@@ -7,8 +7,15 @@ use DucCnzj\Ip\Imp\DataMapImp;
 use PHPUnit\Framework\TestCase;
 use DucCnzj\Ip\Exceptions\MethodNotExistException;
 
+/**
+ * Class MapperTest
+ * @package DucCnzj\Ip\Tests
+ */
 class MapperTest extends TestCase
 {
+    /**
+     * @var array
+     */
     protected $data = [
         'ip'      => '127.0.0.1',
         'country' => '中国',
@@ -25,6 +32,10 @@ class MapperTest extends TestCase
      */
     protected $mapper;
 
+    /**
+     *
+     * @author duc <1025434218@qq.com>
+     */
     protected function setUp()
     {
         parent::setUp();

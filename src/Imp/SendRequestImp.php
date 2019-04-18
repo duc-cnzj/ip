@@ -12,7 +12,7 @@ use GuzzleHttp\ClientInterface;
 interface SendRequestImp
 {
     /**
-     * @param array  $providers
+     * @param array $providers
      * @param string $ip
      *
      * @return mixed

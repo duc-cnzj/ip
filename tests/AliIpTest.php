@@ -12,12 +12,25 @@ use DucCnzj\Ip\Exceptions\AnalysisException;
 use DucCnzj\Ip\Exceptions\BreakLoopException;
 use DucCnzj\Ip\Exceptions\ServerErrorException;
 
+/**
+ * Class AliIpTest
+ * @package DucCnzj\Ip\Tests
+ */
 class AliIpTest extends TestCase
 {
+    /**
+     * @var string
+     */
     protected $url = 'http://iploc.market.alicloudapi.com/v3/ip';
 
+    /**
+     * @var string
+     */
     protected $successReturn = '{"status":"1","info":"OK","infocode":"10000","province":"北京市","city":"北京市","adcode":"110000","rectangle":"116.0119343,39.66127144;116.7829835,40.2164962"}';
 
+    /**
+     * @var string
+     */
     protected $failReturn = '{"status":"1","info":"OK","infocode":"10000","province":[],"city":[],"adcode":[],"rectangle":[]}';
 
     /**
@@ -25,6 +38,10 @@ class AliIpTest extends TestCase
      */
     protected $server;
 
+    /**
+     *
+     * @author duc <1025434218@qq.com>
+     */
     protected function setUp()
     {
         parent::setUp();
