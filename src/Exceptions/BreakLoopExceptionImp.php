@@ -2,6 +2,6 @@
 
 namespace DucCnzj\Ip\Exceptions;
 
-interface BreakLoopExceptionImp
+interface BreakLoopExceptionImp extends \Throwable
 {
 }

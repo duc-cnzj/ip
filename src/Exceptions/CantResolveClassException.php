@@ -2,6 +2,6 @@
 
 namespace DucCnzj\Ip\Exceptions;
 
-interface CantResolveClassException
+interface CantResolveClassException extends \Throwable
 {
 }
