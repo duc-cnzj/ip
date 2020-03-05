@@ -26,7 +26,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "DucCnzj\\Ip\\": "tests/"
+            "DucCnzj\\Ip\\Tests\\": "tests/"
         }
     },
     "extra": {
